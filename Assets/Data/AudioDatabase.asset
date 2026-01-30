@@ -17,3 +17,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 475f4837af487ce4a9e68bb227455e4c, type: 3}
     resourcePath: 
     useClipDirectly: 1
+  - id: 100
+    clip: {fileID: 8300000, guid: 19f89c6e740e7447f9e12a8310d3e973, type: 3}
+    resourcePath: 
+    useClipDirectly: 1

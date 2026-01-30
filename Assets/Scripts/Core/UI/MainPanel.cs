@@ -76,6 +76,6 @@ public class MainPanel : BasePanel
     private void PlayClickSound()
     {
         // (假设你在 AudioID 里定义了 SFX_UIClick)
-        // MusicMgr.Instance.PlaySound(AudioID.SFX_UIClick);
+         MusicMgr.Instance.PlaySound(AudioID.SFX_UIClick);
     }
 }
