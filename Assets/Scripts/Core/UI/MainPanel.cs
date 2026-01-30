@@ -48,6 +48,9 @@ public class MainPanel : BasePanel
 
         // 播放主菜单 BGM
         // (假设你在 AudioID 里定义了 BGM_MainMenu)
+
+
+
         MusicMgr.Instance.PlayBgMusic(AudioID.BGM_MainMenu);
     }
 
