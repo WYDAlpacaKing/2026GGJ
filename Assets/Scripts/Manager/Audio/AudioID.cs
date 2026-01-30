@@ -16,7 +16,7 @@ namespace Alpaca.Game.Audio
         BGM_GoodEnd = 7,
 
         // ========== 音效 ==========
-        SFX_ThrowBook = 100,
+        SFX_UIClick = 100,
         SFX_AliceBroken = 101,
         SFX_CantOpenTheDoor = 102,
         SFX_DoorOpen = 103,

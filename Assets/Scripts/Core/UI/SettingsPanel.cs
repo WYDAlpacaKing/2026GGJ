@@ -64,6 +64,6 @@ public class SettingsPanel : BasePanel
     private void PlayClickSound()
     {
         // 播放通用的 UI 点击音效
-        // MusicMgr.Instance.PlaySound(AudioID.SFX_UIClick);
+         MusicMgr.Instance.PlaySound(AudioID.SFX_UIClick);
     }
 }
