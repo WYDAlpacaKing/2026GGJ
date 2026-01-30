@@ -60,6 +60,7 @@ namespace Alpaca.Game.Audio
 
                 if (!_configDict.ContainsKey(config.id))
                 {
+                    
                     _configDict[config.id] = config;
                     loadedCount++;
                 }
