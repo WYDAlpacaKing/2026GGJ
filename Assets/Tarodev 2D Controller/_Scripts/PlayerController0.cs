@@ -12,6 +12,10 @@ namespace TarodevController.old
         private FrameInput _frameInput;
         private Vector3 _frameVelocity;
         private bool _cachedQueryStartInColliders;
+        private float _forceUngroundTime;
+        private float _springAssistTime;
+        private float _springMaxUpSpeed;
+        private float _springUpAcceleration;
 
         #region Interface
         public Vector2 FrameInput => _frameInput.Move;
@@ -21,7 +25,7 @@ namespace TarodevController.old
 
         private float _time;
         private bool _isWallSliding;
-        private Vector3 _wallHitNormal; // [ÐÂÔö] ´æ´¢Ç½±Ú·¨Ïß
+        private Vector3 _wallHitNormal; // [ï¿½ï¿½ï¿½ï¿½] ï¿½æ´¢Ç½ï¿½Ú·ï¿½ï¿½ï¿½
 
         private void Awake()
         {
@@ -89,6 +93,11 @@ namespace TarodevController.old
 
             if (ceilingHit) _frameVelocity.y = Mathf.Min(0, _frameVelocity.y);
 
+            if (_time < _forceUngroundTime)
+            {
+                groundHit = false;
+            }
+
             if (!_grounded && groundHit)
             {
                 _grounded = true;
@@ -128,7 +137,7 @@ namespace TarodevController.old
             if (Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, inputDir, out RaycastHit hit, _stats.WallDetectionDistance, _stats.ClimbableLayer))
             {
                 _isWallSliding = true;
-                _wallHitNormal = hit.normal; // [ÐÂÔö] ¹Ø¼ü£º¼ÇÂ¼Ç½±ÚµÄ·¨Ïß·½Ïò
+                _wallHitNormal = hit.normal; // [ï¿½ï¿½ï¿½ï¿½] ï¿½Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½Â¼Ç½ï¿½ÚµÄ·ï¿½ï¿½ß·ï¿½ï¿½ï¿½
             }
         }
 
@@ -152,12 +161,12 @@ namespace TarodevController.old
 
             if (!_jumpToConsume && !HasBufferedJump) return;
 
-            // [ÐÂÔö] µÅÇ½ÌøÓÅÏÈ¼¶¸ßÓÚÆÕÍ¨ÌøÔ¾
+            // [ï¿½ï¿½ï¿½ï¿½] ï¿½ï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½Ô¾
             if (_isWallSliding)
             {
                 ExecuteWallJump();
-                _jumpToConsume = false; // ÏûºÄµôÌøÔ¾ÊäÈë
-                return; // Ìø³ö£¬²»ÔÙÖ´ÐÐÏÂÃæµÄÆÕÍ¨ÌøÔ¾Âß¼­
+                _jumpToConsume = false;
+                return;
             }
 
             if (_grounded || CanUseCoyote) ExecuteJump();
@@ -165,7 +174,7 @@ namespace TarodevController.old
             _jumpToConsume = false;
         }
 
-        private void ExecuteJump() // ÆÕÍ¨µØÃæÌøÔ¾
+        private void ExecuteJump()
         {
             _endedJumpEarly = false;
             _timeJumpWasPressed = 0;
@@ -177,22 +186,22 @@ namespace TarodevController.old
 
 
 
-        private void ExecuteWallJump() // [ÐÂÔö] µÅÇ½Ìø
+        private void ExecuteWallJump() // [ï¿½ï¿½ï¿½ï¿½] ï¿½ï¿½Ç½ï¿½ï¿½
         {
             _endedJumpEarly = false;
             _bufferedJumpUsable = false;
             _timeJumpWasPressed = 0;
 
-            // 1. ºËÐÄÂß¼­£ºÑØ·¨Ïßµ¯¿ª + ÏòÉÏµ¯Æð
-            // Ê¹ÓÃ·¨Ïß(Normal)³ËÒÔË®Æ½Á¦¶È£¬¼ÓÉÏVector3.up³ËÒÔ´¹Ö±Á¦¶È
+            // 1. ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½Ø·ï¿½ï¿½ßµï¿½ï¿½ï¿½ + ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½
+            // Ê¹ï¿½Ã·ï¿½ï¿½ï¿½(Normal)ï¿½ï¿½ï¿½ï¿½Ë®Æ½ï¿½ï¿½ï¿½È£ï¿½ï¿½ï¿½ï¿½ï¿½Vector3.upï¿½ï¿½ï¿½Ô´ï¿½Ö±ï¿½ï¿½ï¿½ï¿½
             Vector3 jumpDir = _wallHitNormal * _stats.WallJumpHorizontalPower;
             jumpDir.y = _stats.WallJumpVerticalPower;
 
             _frameVelocity = jumpDir;
 
-            // 2. ¹Ø¼üÐÞÕý£ºÁ¢¿ÌÍË³ö»¬Ç½×´Ì¬
-            // Èç¹û²»¼ÓÕâÐÐ£¬HandleDirection»áÔÚÍ¬Ò»Ö¡ÄÚ¼ì²âµ½ isWallSliding ÎªÕæ£¬
-            // ´Ó¶ø°ÑÎÒÃÇ¸Õ¸³ÖµµÄ X/Z ËÙ¶ÈÇ¿ÖÆ¹éÁã¡£
+            // 2. ï¿½Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½Ç½×´Ì¬
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½HandleDirectionï¿½ï¿½ï¿½ï¿½Í¬Ò»Ö¡ï¿½Ú¼ï¿½âµ½ isWallSliding Îªï¿½æ£¬
+            // ï¿½Ó¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¸Õ¸ï¿½Öµï¿½ï¿½ X/Z ï¿½Ù¶ï¿½Ç¿ï¿½Æ¹ï¿½ï¿½ã¡£
             _isWallSliding = false;
 
             Jumped?.Invoke();
@@ -211,11 +220,11 @@ namespace TarodevController.old
                 return;
             }
 
-            // [ÓÅ»¯ÌáÊ¾]£º
-            // ÔÚµÅÇ½Ìøºó£¬Íæ¼ÒÍ¨³£»áÁ¢¿Ì°´»ØÇ½µÄ·½Ïò¼ü¡£
-            // ÕâÀïµÄ HandleDirection »áÁ¢¿Ì²úÉúÒ»¸ö·´Ïò¼ÓËÙ¶ÈÈ¥µÖÏûµÅÇ½ÌøµÄË®Æ½ËÙ¶È¡£
-            // Èç¹û¾õµÃµÅÇ½Ìø¡°Ìø²»Ô¶¡±£¬ÊÇÒòÎªÕâÀïµÄ AirAcceleration Ì«¸ßÁË£¬»òÕßÐèÒªÌí¼Ó¶ÌÔÝµÄ¡°¿ÕÖÐÊäÈëËø¶¨(Air Lock)¡±¡£
-            // µ«ÎªÁË±£³Ö´úÂë¼ò½à£¬ÔÝÊ±Î¬³ÖÔ­Ñù¡£
+            // [ï¿½Å»ï¿½ï¿½ï¿½Ê¾]ï¿½ï¿½
+            // ï¿½Úµï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì°ï¿½ï¿½ï¿½Ç½ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ HandleDirection ï¿½ï¿½ï¿½ï¿½ï¿½Ì²ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç½ï¿½ï¿½ï¿½ï¿½Ë®Æ½ï¿½Ù¶È¡ï¿½
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½Ç½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ AirAcceleration Ì«ï¿½ï¿½ï¿½Ë£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ó¶ï¿½ï¿½ÝµÄ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(Air Lock)ï¿½ï¿½ï¿½ï¿½
+            // ï¿½ï¿½Îªï¿½Ë±ï¿½ï¿½Ö´ï¿½ï¿½ï¿½ï¿½à£¬ï¿½ï¿½Ê±Î¬ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½
 
             if (_frameInput.Move.x == 0)
             {
@@ -244,6 +253,16 @@ namespace TarodevController.old
 
         private void HandleGravity()
         {
+            if (_springAssistTime > 0f && _frameVelocity.y > 0f)
+            {
+                _springAssistTime -= Time.fixedDeltaTime;
+                _frameVelocity.y = Mathf.MoveTowards(
+                    _frameVelocity.y,
+                    _springMaxUpSpeed,
+                    _springUpAcceleration * Time.fixedDeltaTime
+                );
+            }
+
             if (_isWallSliding)
             {
                 _frameVelocity.y = Mathf.MoveTowards(_frameVelocity.y, -_stats.WallSlideSpeed, _stats.FallAcceleration * Time.fixedDeltaTime);
@@ -264,6 +283,40 @@ namespace TarodevController.old
 
         private void ApplyMovement() => _rb.linearVelocity = _frameVelocity;
 
+        public void AddFrameVelocity(Vector3 velocityChange, bool resetVelocity = false, float ungroundTime = 0.1f)
+        {
+            if (resetVelocity) _frameVelocity = Vector3.zero;
+            _frameVelocity += velocityChange;
+
+            if (velocityChange.y > 0f && ungroundTime > 0f)
+            {
+                _forceUngroundTime = Mathf.Max(_forceUngroundTime, _time + ungroundTime);
+            }
+        }
+
+        public void ApplySpringImpulse(
+            float force,
+            float maxUpSpeed,
+            float upAcceleration,
+            float assistDuration,
+            float ungroundTime,
+            bool resetVelocity = true)
+        {
+            AddFrameVelocity(Vector3.up * force, resetVelocity, ungroundTime);
+
+            if (maxUpSpeed > 0f)
+            {
+                _frameVelocity.y = Mathf.Min(_frameVelocity.y, maxUpSpeed);
+            }
+
+            if (assistDuration > 0f && upAcceleration > 0f)
+            {
+                _springMaxUpSpeed = maxUpSpeed;
+                _springUpAcceleration = upAcceleration;
+                _springAssistTime = Mathf.Max(_springAssistTime, assistDuration);
+            }
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
@@ -275,7 +328,7 @@ namespace TarodevController.old
         private void OnDrawGizmos()
         {
             if (_col == null || _stats == null) return;
-            // (±£³ÖÖ®Ç°µÄµ÷ÊÔ´úÂë²»±ä)
+            // (ï¿½ï¿½ï¿½ï¿½Ö®Ç°ï¿½Äµï¿½ï¿½Ô´ï¿½ï¿½ë²»ï¿½ï¿½)
             Vector3 inputDir = Vector3.zero;
             if (_frameInput.Move.sqrMagnitude > 0.01f)
             {
@@ -298,7 +351,7 @@ namespace TarodevController.old
             {
                 Gizmos.color = Color.yellow;
                 Gizmos.DrawSphere(hit.point, 0.1f);
-                // [ÐÂÔöµ÷ÊÔ] »­³ö·¨Ïß·½Ïò£¬·½±ã¿´µÅÇ½ÌøµÄ·½Ïò
+                // [ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß·ï¿½ï¿½ò£¬·ï¿½ï¿½ã¿´ï¿½ï¿½Ç½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
                 Gizmos.color = Color.blue;
                 Gizmos.DrawRay(hit.point, hit.normal);
             }

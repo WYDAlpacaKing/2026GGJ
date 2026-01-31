@@ -2,10 +2,11 @@ using UnityEngine;
 
 public class MouseFollow : MonoBehaviour
 {
-    [Header("设置")]
-    [SerializeField] private LayerMask _groundLayer; // 射线检测的层（如地面）
-    [SerializeField] private float _followSpeed = 15f; // 跟随平滑速度
-    [SerializeField] private bool _useSmoothing = true; // 是否开启平滑跟随
+    [Header("Config")]
+    [SerializeField] private MouseFollowConfig _config;
+
+    [Header("Reveal Control")]
+    [SerializeField] private bool _canReveal = true;
 
     private Camera _mainCamera;
 
@@ -16,35 +17,77 @@ public class MouseFollow : MonoBehaviour
 
     private void Update()
     {
-        MoveObjectToMouse();
+        if (_config == null)
+        {
+            return;
+        }
+
+        switch (_config.MoveModeValue)
+        {
+            case MouseFollowConfig.MoveMode.MouseFollow:
+                MoveObjectToMouse();
+                break;
+            case MouseFollowConfig.MoveMode.Keyboard:
+                MoveObjectByKeyboard();
+                break;
+        }
+    }
+
+    public bool CanReveal => _canReveal;
+
+    public void SetCanReveal(bool canReveal)
+    {
+        _canReveal = canReveal;
     }
 
     private void MoveObjectToMouse()
     {
-        // 1. 从摄像机发射射线
         Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
 
-        // 2. 进行射线检测
-        // 我们假设物体在一个水平面上移动，或者检测特定的地面层
-        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _groundLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _config.GroundLayer))
         {
             Vector3 targetPosition = hit.point;
 
-            // 如果你不希望物体陷入地面，可以根据物体的尺寸增加一个 y 轴偏移
-            // targetPosition.y += transform.localScale.y / 2f;
-
-            //z轴保持不变
             targetPosition.z = transform.position.z;
-            if (_useSmoothing)
+            if (_config.MouseUseSmoothing)
             {
-                // 使用 Lerp 实现平滑跟随，手感更佳
-                transform.position = Vector3.Lerp(transform.position, targetPosition, _followSpeed * Time.deltaTime);
+                // ??? Lerp ?????????锟斤拷??锟斤拷???
+                transform.position = Vector3.Lerp(
+                    transform.position,
+                    targetPosition,
+                    _config.MouseLerpSpeed * Time.deltaTime
+                );
             }
             else
             {
-                // 瞬间跟随
+                // ??????
                 transform.position = targetPosition;
             }
+        }
+    }
+
+    private void MoveObjectByKeyboard()
+    {
+        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal2"), Input.GetAxisRaw("Vertical2"), 0f);
+        if (input.sqrMagnitude > 1f)
+        {
+            input.Normalize();
+        }
+
+        Vector3 targetPosition = transform.position + input * (_config.KeyboardMoveSpeed * Time.deltaTime);
+        targetPosition.z = transform.position.z;
+
+        if (_config.KeyboardUseSmoothing)
+        {
+            transform.position = Vector3.Lerp(
+                transform.position,
+                targetPosition,
+                _config.KeyboardLerpSpeed * Time.deltaTime
+            );
+        }
+        else
+        {
+            transform.position = targetPosition;
         }
     }
 }

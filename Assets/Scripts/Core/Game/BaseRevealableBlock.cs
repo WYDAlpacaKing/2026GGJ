@@ -4,22 +4,22 @@ using UnityEngine;
 [RequireComponent(typeof(Renderer))]
 public class BaseRevealableBlock : MonoBehaviour
 {
-    [Header("ÏÔÐÎÉèÖÃ")]
-    [SerializeField] protected float _baseRevealDuration = 2.0f; // ÏÔÐÎ»ù×¼Ê±¼ä
-    [SerializeField] protected float _vanishDuration = 1.0f;     // ÏûÊ§Ê±¼ä
-    [SerializeField] protected Collider _solidCollider;          // ÎïÀíÅö×²Ìå
+    [Header("Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")]
+    [SerializeField] protected float _baseRevealDuration = 2.0f; 
+    [SerializeField] protected float _vanishDuration = 1.0f;     
+    [SerializeField] protected Collider _solidCollider;          
 
-    [Header("ÊÓ¾õ·´À¡")]
+    [Header("ï¿½Ó¾ï¿½ï¿½ï¿½ï¿½ï¿½")]
     [SerializeField] protected Color _hiddenColor = new Color(1, 1, 1, 0);
     [SerializeField] protected Color _visibleColor = Color.white;
     [SerializeField] protected string _colorPropertyName = "_BaseColor";
 
-    // ÄÚ²¿±äÁ¿
+    // ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½
     protected float _currentAlpha = 0f;
     protected bool _isBrushInside = false;
     protected Transform _brushTransform;
 
-    // äÖÈ¾ÓÅ»¯
+    // ï¿½ï¿½È¾ï¿½Å»ï¿½
     protected Renderer _renderer;
     protected MaterialPropertyBlock _propBlock;
     protected int _colorPropertyID;
@@ -28,12 +28,12 @@ public class BaseRevealableBlock : MonoBehaviour
     {
         _renderer = GetComponent<Renderer>();
         _propBlock = new MaterialPropertyBlock();
-        _colorPropertyID = Shader.PropertyToID(_colorPropertyName); // »º´æIDÌáÉýÐÔÄÜ
+        _colorPropertyID = Shader.PropertyToID(_colorPropertyName); // ï¿½ï¿½ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-        // È·±£Ö÷ColliderÊÇTrigger
+        // È·ï¿½ï¿½ï¿½ï¿½Colliderï¿½ï¿½Trigger
         GetComponent<Collider>().isTrigger = true;
 
-        // ³õÊ¼×´Ì¬£ºÎÞÅö×²£¬È«Í¸Ã÷
+        // ï¿½ï¿½Ê¼×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×²ï¿½ï¿½È«Í¸ï¿½ï¿½
         if (_solidCollider != null) _solidCollider.enabled = false;
         UpdateVisuals(0f);
     }
@@ -45,32 +45,45 @@ public class BaseRevealableBlock : MonoBehaviour
 
     private void HandleStateLogic()
     {
-        // ºËÐÄÂß¼­ÖØ¹¹£º²»ÔÙÒÀÀµ¸´ÔÓµÄ switch ×´Ì¬»ú£¬¶øÊÇ»ùÓÚµ±Ç°Ìõ¼þ¼ÆËã¡°Ä¿±êÐÐÎª¡±
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½Ø¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Óµï¿½ switch ×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç»ï¿½ï¿½Úµï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã¡°Ä¿ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½
 
-        // Ìõ¼þ£ºÊó±ê±ØÐëÔÚ´¥·¢Æ÷ÄÚ£¬ÇÒÍæ¼Ò°´×¡×ó¼ü
-        bool isInteracting = _isBrushInside && _brushTransform != null && Input.GetMouseButton(0);
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½Ò°ï¿½×¡ï¿½ï¿½ï¿½
+        //bool isInteracting = _isBrushInside && _brushTransform != null && Input.GetMouseButton(0);
+        bool isInteracting = _isBrushInside && _brushTransform != null && IsBrushAllowed(_brushTransform);
 
         if (isInteracting)
         {
-            // --- ÏÔÐÎÂß¼­ ---
+            // --- ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ ---
             float overlapFactor = CalculateOverlapFactor();
-            // ÖØºÏ¶ÈÔ½¸ß£¬ËÙ¶ÈÔ½¿ì (1±¶ ~ 4±¶ËÙ)
+            // ï¿½ØºÏ¶ï¿½Ô½ï¿½ß£ï¿½ï¿½Ù¶ï¿½Ô½ï¿½ï¿½ (1ï¿½ï¿½ ~ 4ï¿½ï¿½ï¿½ï¿½)
             float speed = (1f / _baseRevealDuration) * (1f + overlapFactor * 3f);
 
             _currentAlpha = Mathf.MoveTowards(_currentAlpha, 1f, speed * Time.deltaTime);
         }
         else
         {
-            // --- ÏûÊ§Âß¼­ ---
-            // Ö»Òª²»Âú×ã½»»¥Ìõ¼þ£¬¾Í×Ô¶¯»ØÍËÏûÊ§
+            // --- ï¿½ï¿½Ê§ï¿½ß¼ï¿½ ---
+            // Ö»Òªï¿½ï¿½ï¿½ï¿½ï¿½ã½»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§
             float speed = 1f / _vanishDuration;
             _currentAlpha = Mathf.MoveTowards(_currentAlpha, 0f, speed * Time.deltaTime);
         }
 
-        // --- Åö×²Ìå×´Ì¬¹ÜÀí ---
-        // Ö»ÓÐµ±ÍêÈ«ÏÔÐÎ(Alpha >= 1)Ê±£¬¿ªÆôÅö×²
-        // Ö»ÓÐµ±ÍêÈ«ÏûÊ§(Alpha <= 0)Ê±£¬¹Ø±ÕÅö×² (¸ù¾ÝÄãµÄÐèÇó£¬ÏûÊ§Ê±¼ä½áÊøºóÅö×²²ÅÏûÊ§)
+        // --- ï¿½ï¿½×²ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ ---
+        UpdateSolidCollider();
 
+        // --- ï¿½ï¿½ï¿½Â»ï¿½ï¿½ï¿½ ---
+        UpdateVisuals(_currentAlpha);
+    }
+
+    protected virtual void OnFullyRevealed()
+    {
+
+    }
+
+    protected virtual void UpdateSolidCollider()
+    {
+        // Ö»ï¿½Ðµï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½(Alpha >= 1)Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×²
+        // Ö»ï¿½Ðµï¿½ï¿½ï¿½È«ï¿½ï¿½Ê§(Alpha <= 0)Ê±ï¿½ï¿½ï¿½Ø±ï¿½ï¿½ï¿½×² (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×²ï¿½ï¿½ï¿½ï¿½Ê§)
         if (_currentAlpha >= 0.99f)
         {
             if (_solidCollider != null && !_solidCollider.enabled)
@@ -82,43 +95,38 @@ public class BaseRevealableBlock : MonoBehaviour
             if (_solidCollider != null && _solidCollider.enabled)
                 _solidCollider.enabled = false;
         }
-
-        // --- ¸üÐÂ»­Ãæ ---
-        UpdateVisuals(_currentAlpha);
-    }
-
-    protected virtual void OnFullyRevealed()
-    {
-
     }
 
     protected float CalculateOverlapFactor()
     {
         if (_brushTransform == null) return 0;
-        // ¼òµ¥µÄ¾àÀëË¥¼õËã·¨
+        // ï¿½òµ¥µÄ¾ï¿½ï¿½ï¿½Ë¥ï¿½ï¿½ï¿½ã·¨
         float maxDist = transform.localScale.x * 0.8f;
         float dist = Vector3.Distance(transform.position, _brushTransform.position);
         float factor = 1f - Mathf.Clamp01(dist / maxDist);
         return factor * factor;
     }
 
-    protected void UpdateVisuals(float alpha)
+    protected virtual void UpdateVisuals(float alpha)
     {
-        // ÑÕÉ«²åÖµ
+        // ï¿½ï¿½É«ï¿½ï¿½Öµ
         Color c = Color.Lerp(_hiddenColor, _visibleColor, alpha);
 
         _renderer.GetPropertyBlock(_propBlock);
-        _propBlock.SetColor(_colorPropertyID, c); // Ê¹ÓÃ»º´æµÄID
+        _propBlock.SetColor(_colorPropertyID, c); // Ê¹ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ID
         _renderer.SetPropertyBlock(_propBlock);
     }
 
-    // --- ´¥·¢Æ÷Âß¼­±£³Ö¼òµ¥ ---
+    // --- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½Ö¼ï¿½ ---
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Brush"))
         {
-            _isBrushInside = true;
-            _brushTransform = other.transform;
+            if (IsBrushAllowed(other.transform))
+            {
+                _isBrushInside = true;
+                _brushTransform = other.transform;
+            }
         }
     }
 
@@ -129,5 +137,12 @@ public class BaseRevealableBlock : MonoBehaviour
             _isBrushInside = false;
             _brushTransform = null;
         }
+    }
+
+    private bool IsBrushAllowed(Transform brushTransform)
+    {
+        if (brushTransform == null) return false;
+        if (!brushTransform.TryGetComponent(out MouseFollow mouseFollow)) return true;
+        return mouseFollow.CanReveal;
     }
 }
