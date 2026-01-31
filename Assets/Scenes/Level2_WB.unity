@@ -973,7 +973,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550991620921652588, guid: b2d9a65dfb4924a4abcdee41b350ee5b, type: 3}
       propertyPath: _vanishDuration
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2550991620921652588, guid: b2d9a65dfb4924a4abcdee41b350ee5b, type: 3}
       propertyPath: _baseRevealDuration
