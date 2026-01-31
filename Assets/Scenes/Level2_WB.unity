@@ -183,6 +183,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2550991620921652588, guid: b2d9a65dfb4924a4abcdee41b350ee5b, type: 3}
+      propertyPath: _visibleColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2550991620921652588, guid: b2d9a65dfb4924a4abcdee41b350ee5b, type: 3}
+      propertyPath: _visibleColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2550991620921652588, guid: b2d9a65dfb4924a4abcdee41b350ee5b, type: 3}
+      propertyPath: _visibleColor.r
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1284,7 +1296,15 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 909497030572361670, guid: 1545b47b2b226f54b89f4dbc9034d685, type: 3}
+      propertyPath: _hiddenColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 909497030572361670, guid: 1545b47b2b226f54b89f4dbc9034d685, type: 3}
       propertyPath: _vanishDuration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 909497030572361670, guid: 1545b47b2b226f54b89f4dbc9034d685, type: 3}
+      propertyPath: _visibleColor.a
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 909497030572361670, guid: 1545b47b2b226f54b89f4dbc9034d685, type: 3}

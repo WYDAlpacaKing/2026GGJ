@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 722bc75dfc7ec744cbf958519186267e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -121,10 +121,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80040fce9f88a6842855515fe0394f31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _baseRevealDuration: 2
+  _baseRevealDuration: 1
   _vanishDuration: 1
   _solidCollider: {fileID: 8119748679327039897}
-  _hiddenColor: {r: 1, g: 0.7418307, b: 0.25471687, a: 0}
+  _hiddenColor: {r: 1, g: 0.7835318, b: 0, a: 1}
   _visibleColor: {r: 1, g: 1, b: 1, a: 1}
   _colorPropertyName: _BaseColor
   _visibleLayer:
