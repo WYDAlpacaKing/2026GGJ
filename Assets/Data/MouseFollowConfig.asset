@@ -18,6 +18,6 @@ MonoBehaviour:
     m_Bits: 64
   MouseLerpSpeed: 15
   MouseUseSmoothing: 1
-  KeyboardMoveSpeed: 50
-  KeyboardLerpSpeed: 15
+  KeyboardMoveSpeed: 80
+  KeyboardLerpSpeed: 20
   KeyboardUseSmoothing: 1
