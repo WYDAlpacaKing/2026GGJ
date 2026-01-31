@@ -12,6 +12,8 @@ public class RevealableChargedSpring : BaseRevealableBlock
 
     private bool _wasInteracting;
     private Vector3 _compressionOriginalScale;
+    private bool _hasPendingRelease;
+    private float _pendingReleaseForce;
 
     protected override void Awake()
     {
@@ -110,56 +112,54 @@ public class RevealableChargedSpring : BaseRevealableBlock
         float force = _config.StageReleaseForces[forceIndex];
         if (force <= 0f) return;
 
-        ApplyForceToOverlaps(force);
-    }
-
-    private void ApplyForceToOverlaps(float force)
-    {
-        if (_solidCollider == null) return;
-
-        Bounds b = _solidCollider.bounds;
-        Collider[] hits = Physics.OverlapBox(
-            b.center,
-            b.extents,
-            _solidCollider.transform.rotation,
-            ~0,
-            QueryTriggerInteraction.Ignore
-        );
-
-        Vector3 dir = transform.up;
-        foreach (Collider hit in hits)
-        {
-            if (hit.TryGetComponent(out PlayerController0 controller))
-            {
-                controller.ApplySpringImpulse(
-                    dir,
-                    force,
-                    _config.MaxUpSpeed,
-                    _config.UpAcceleration,
-                    _config.AssistDuration,
-                    _config.UngroundTime,
-                    true
-                );
-                continue;
-            }
-
-            if (hit.attachedRigidbody == null) continue;
-            hit.attachedRigidbody.AddForce(dir * force, ForceMode.VelocityChange);
-        }
+        _pendingReleaseForce = force;
+        _hasPendingRelease = true;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if (_config == null) return;
-        if (_currentAlpha > 0.01f) return;
+
+        if (TryApplyPendingRelease(collision.collider)) return;
+
+        if (_currentAlpha <= 0.01f)
+        {
+            ApplyForceToCollider(collision.collider, _config.InactiveBounceForce);
+        }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (_config == null) return;
+        TryApplyPendingRelease(collision.collider);
+    }
+
+    private bool TryApplyPendingRelease(Collider collider)
+    {
+        if (!_hasPendingRelease) return false;
+
+        float force = _pendingReleaseForce;
+        _hasPendingRelease = false;
+        _pendingReleaseForce = 0f;
+
+        if (force <= 0f) return false;
+
+        ApplyForceToCollider(collider, force);
+        return true;
+    }
+
+    private void ApplyForceToCollider(Collider collider, float force)
+    {
+        if (force <= 0f) return;
 
         Vector3 dir = transform.up;
 
-        if (collision.collider.TryGetComponent(out PlayerController0 controller))
+        PlayerController0 controller = collider.GetComponentInParent<PlayerController0>();
+        if (controller != null)
         {
             controller.ApplySpringImpulse(
                 dir,
-                _config.InactiveBounceForce,
+                force,
                 _config.MaxUpSpeed,
                 _config.UpAcceleration,
                 _config.AssistDuration,
@@ -169,9 +169,9 @@ public class RevealableChargedSpring : BaseRevealableBlock
             return;
         }
 
-        Rigidbody rb = collision.rigidbody;
+        Rigidbody rb = collider.attachedRigidbody;
         if (rb == null) return;
-        rb.AddForce(dir * _config.InactiveBounceForce, ForceMode.VelocityChange);
+        rb.AddForce(dir * force, ForceMode.VelocityChange);
     }
 
     protected virtual void ApplyCompressionVisual(float stageProgress, int stageIndex)
