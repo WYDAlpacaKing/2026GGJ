@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.92, y: -0, z: 0}
-  m_LocalScale: {x: 2.3672, y: 1, z: 1}
+  m_LocalScale: {x: 3.5, y: 1, z: 3.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7648076162615068546}
@@ -125,7 +125,7 @@ MonoBehaviour:
   _baseRevealDuration: 1
   _vanishDuration: 1
   _solidCollider: {fileID: 1350882305504686653}
-  _hiddenColor: {r: 1, g: 0, b: 0, a: 0.9137255}
+  _hiddenColor: {r: 1, g: 0.818261, b: 0, a: 0.9137255}
   _visibleColor: {r: 1, g: 1, b: 1, a: 1}
   _colorPropertyName: _BaseColor
 --- !u!1 &1496356639427237424
