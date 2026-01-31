@@ -8,11 +8,23 @@ public class MouseFollow : MonoBehaviour
     [Header("Reveal Control")]
     [SerializeField] private bool _canReveal = true;
 
+    [Header("Follow Target")]
+    [SerializeField] private Transform _followRoot;
+
+    [Header("Collider Facing")]
+    [SerializeField] private Transform _colliderTransform;
+    [SerializeField] private Vector3 _upDirection = Vector3.up;
+
     private Camera _mainCamera;
 
     private void Awake()
     {
         _mainCamera = Camera.main;
+
+        if (_followRoot == null)
+        {
+            _followRoot = transform.parent != null ? transform.parent : transform;
+        }
     }
 
     private void Update()
@@ -31,6 +43,8 @@ public class MouseFollow : MonoBehaviour
                 MoveObjectByKeyboard();
                 break;
         }
+
+        UpdateColliderFacing();
     }
 
     public bool CanReveal => _canReveal;
@@ -48,12 +62,12 @@ public class MouseFollow : MonoBehaviour
         {
             Vector3 targetPosition = hit.point;
 
-            targetPosition.z = transform.position.z;
+            targetPosition.z = _followRoot.position.z;
             if (_config.MouseUseSmoothing)
             {
                 // ??? Lerp ?????????��??��???
-                transform.position = Vector3.Lerp(
-                    transform.position,
+                _followRoot.position = Vector3.Lerp(
+                    _followRoot.position,
                     targetPosition,
                     _config.MouseLerpSpeed * Time.deltaTime
                 );
@@ -61,7 +75,7 @@ public class MouseFollow : MonoBehaviour
             else
             {
                 // ??????
-                transform.position = targetPosition;
+                _followRoot.position = targetPosition;
             }
         }
     }
@@ -74,20 +88,32 @@ public class MouseFollow : MonoBehaviour
             input.Normalize();
         }
 
-        Vector3 targetPosition = transform.position + input * (_config.KeyboardMoveSpeed * Time.deltaTime);
-        targetPosition.z = transform.position.z;
+        Vector3 targetPosition = _followRoot.position + input * (_config.KeyboardMoveSpeed * Time.deltaTime);
+        targetPosition.z = _followRoot.position.z;
 
         if (_config.KeyboardUseSmoothing)
         {
-            transform.position = Vector3.Lerp(
-                transform.position,
+            _followRoot.position = Vector3.Lerp(
+                _followRoot.position,
                 targetPosition,
                 _config.KeyboardLerpSpeed * Time.deltaTime
             );
         }
         else
         {
-            transform.position = targetPosition;
+            _followRoot.position = targetPosition;
         }
+    }
+
+    private void UpdateColliderFacing()
+    {
+        if (_mainCamera == null) return;
+
+        Transform target = _colliderTransform != null ? _colliderTransform : transform;
+        Vector3 toTarget = target.position - _mainCamera.transform.position;
+        if (toTarget.sqrMagnitude <= 0.0001f) return;
+
+        Quaternion lookRotation = Quaternion.LookRotation(toTarget.normalized, _upDirection);
+        target.rotation = lookRotation;
     }
 }
