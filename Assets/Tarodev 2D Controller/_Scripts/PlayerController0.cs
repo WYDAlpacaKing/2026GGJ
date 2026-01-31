@@ -48,7 +48,7 @@ namespace TarodevController.old
             {
                 JumpDown = Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.C),
                 JumpHeld = Input.GetButton("Jump") || Input.GetKey(KeyCode.C),
-                Move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
+                Move = new Vector2(Input.GetAxisRaw("Horizontal"), 0f)
             };
 
             if (_stats.SnapInput)
@@ -125,19 +125,20 @@ namespace TarodevController.old
             _isWallSliding = false;
 
             if (_grounded || _frameVelocity.y > 0) return;
-            if (_frameInput.Move.sqrMagnitude < 0.01f) return;
 
-            Vector3 inputDir = new Vector3(_frameInput.Move.x, 0, _frameInput.Move.y).normalized;
             Vector3 colCenter = transform.position + _col.center;
             float halfHeight = _col.height / 2f;
             float shrinkAmount = 0.1f;
             Vector3 point1 = colCenter + Vector3.up * (halfHeight - _col.radius - shrinkAmount);
             Vector3 point2 = colCenter - Vector3.up * (halfHeight - _col.radius - shrinkAmount);
 
-            if (Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, inputDir, out RaycastHit hit, _stats.WallDetectionDistance, _stats.ClimbableLayer))
+            bool hitRight = Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, Vector3.right, out RaycastHit hitR, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+            bool hitLeft = Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, Vector3.left, out RaycastHit hitL, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+
+            if (hitRight || hitLeft)
             {
                 _isWallSliding = true;
-                _wallHitNormal = hit.normal; // [����] �ؼ�����¼ǽ�ڵķ��߷���
+                _wallHitNormal = hitRight ? hitR.normal : hitL.normal; // [����] �ؼ�����¼ǽ�ڵķ��߷���
             }
         }
 
@@ -162,7 +163,7 @@ namespace TarodevController.old
             if (!_jumpToConsume && !HasBufferedJump) return;
 
             // [����] ��ǽ�����ȼ�������ͨ��Ծ
-            if (_isWallSliding)
+            if (_isWallSliding && _jumpToConsume)
             {
                 ExecuteWallJump();
                 _jumpToConsume = false;
