@@ -1,23 +1,16 @@
 using System;
 using UnityEngine;
 
-namespace TarodevController
+namespace TarodevController.old
 {
-    /// <summary>
-    /// Hey!
-    /// Tarodev here. I built this controller as there was a severe lack of quality & free 2D controllers out there.
-    /// I have a premium version on Patreon, which has every feature you'd expect from a polished controller. Link: https://www.patreon.com/tarodev
-    /// You can play and compete for best times here: https://tarodev.itch.io/extended-ultimate-2d-controller
-    /// If you hve any questions or would like to brag about your score, come to discord: https://discord.gg/tarodev
-    /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
-    public class PlayerController : MonoBehaviour, IPlayerController
+    public class PlayerController0 : MonoBehaviour, IPlayerController
     {
         [SerializeField] private ScriptableStats _stats;
         private Rigidbody _rb;
         private CapsuleCollider _col;
         private FrameInput _frameInput;
-        private Vector3 _frameVelocity; // 2D Vector2 -> 3D Vector3
+        private Vector3 _frameVelocity;
         private bool _cachedQueryStartInColliders;
 
         #region Interface
@@ -27,13 +20,14 @@ namespace TarodevController
         #endregion
 
         private float _time;
+        private bool _isWallSliding;
+        private Vector3 _wallHitNormal; // [新增] 存储墙壁法线
 
         private void Awake()
         {
             _rb = GetComponent<Rigidbody>();
             _col = GetComponent<CapsuleCollider>();
 
-            // 必须冻结旋转，否则胶囊体会因为物理碰撞倒下
             _rb.constraints = RigidbodyConstraints.FreezeRotation;
             _cachedQueryStartInColliders = Physics.queriesHitTriggers;
         }
@@ -69,6 +63,7 @@ namespace TarodevController
         private void FixedUpdate()
         {
             CheckCollisions();
+            CheckWallSlide();
 
             HandleJump();
             HandleDirection();
@@ -84,12 +79,8 @@ namespace TarodevController
 
         private void CheckCollisions()
         {
-            // 保持原有关闭初始碰撞检测的逻辑
             Physics.queriesHitTriggers = false;
 
-            // 3D CapsuleCast 适配
-            // 参数：起点, 半径, 方向, 距离, 图层
-            // 这里使用球体检测模拟原脚本的 CapsuleCast 逻辑，检测脚下和头顶
             Vector3 center = transform.position + _col.center;
             float castDistance = _stats.GrounderDistance;
 
@@ -118,6 +109,32 @@ namespace TarodevController
 
         #endregion
 
+        #region Wall Slide
+
+        private void CheckWallSlide()
+        {
+            _isWallSliding = false;
+
+            if (_grounded || _frameVelocity.y > 0) return;
+            if (_frameInput.Move.sqrMagnitude < 0.01f) return;
+
+            Vector3 inputDir = new Vector3(_frameInput.Move.x, 0, _frameInput.Move.y).normalized;
+            Vector3 colCenter = transform.position + _col.center;
+            float halfHeight = _col.height / 2f;
+            float shrinkAmount = 0.1f;
+            Vector3 point1 = colCenter + Vector3.up * (halfHeight - _col.radius - shrinkAmount);
+            Vector3 point2 = colCenter - Vector3.up * (halfHeight - _col.radius - shrinkAmount);
+
+            if (Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, inputDir, out RaycastHit hit, _stats.WallDetectionDistance, _stats.ClimbableLayer))
+            {
+                _isWallSliding = true;
+                _wallHitNormal = hit.normal; // [新增] 关键：记录墙壁的法线方向
+            }
+        }
+
+
+        #endregion
+
         #region Jumping
 
         private bool _jumpToConsume;
@@ -135,12 +152,20 @@ namespace TarodevController
 
             if (!_jumpToConsume && !HasBufferedJump) return;
 
+            // [新增] 蹬墙跳优先级高于普通跳跃
+            if (_isWallSliding)
+            {
+                ExecuteWallJump();
+                _jumpToConsume = false; // 消耗掉跳跃输入
+                return; // 跳出，不再执行下面的普通跳跃逻辑
+            }
+
             if (_grounded || CanUseCoyote) ExecuteJump();
 
             _jumpToConsume = false;
         }
 
-        private void ExecuteJump()
+        private void ExecuteJump() // 普通地面跳跃
         {
             _endedJumpEarly = false;
             _timeJumpWasPressed = 0;
@@ -150,13 +175,48 @@ namespace TarodevController
             Jumped?.Invoke();
         }
 
+
+
+        private void ExecuteWallJump() // [新增] 蹬墙跳
+        {
+            _endedJumpEarly = false;
+            _bufferedJumpUsable = false;
+            _timeJumpWasPressed = 0;
+
+            // 1. 核心逻辑：沿法线弹开 + 向上弹起
+            // 使用法线(Normal)乘以水平力度，加上Vector3.up乘以垂直力度
+            Vector3 jumpDir = _wallHitNormal * _stats.WallJumpHorizontalPower;
+            jumpDir.y = _stats.WallJumpVerticalPower;
+
+            _frameVelocity = jumpDir;
+
+            // 2. 关键修正：立刻退出滑墙状态
+            // 如果不加这行，HandleDirection会在同一帧内检测到 isWallSliding 为真，
+            // 从而把我们刚赋值的 X/Z 速度强制归零。
+            _isWallSliding = false;
+
+            Jumped?.Invoke();
+        }
+
         #endregion
 
         #region Horizontal
 
         private void HandleDirection()
         {
-            // 原逻辑：x 轴处理。在 3D 中，Move.x 对应世界 X，Move.y 对应世界 Z
+            if (_isWallSliding)
+            {
+                _frameVelocity.x = 0;
+                _frameVelocity.z = 0;
+                return;
+            }
+
+            // [优化提示]：
+            // 在蹬墙跳后，玩家通常会立刻按回墙的方向键。
+            // 这里的 HandleDirection 会立刻产生一个反向加速度去抵消蹬墙跳的水平速度。
+            // 如果觉得蹬墙跳“跳不远”，是因为这里的 AirAcceleration 太高了，或者需要添加短暂的“空中输入锁定(Air Lock)”。
+            // 但为了保持代码简洁，暂时维持原样。
+
             if (_frameInput.Move.x == 0)
             {
                 var deceleration = _grounded ? _stats.GroundDeceleration : _stats.AirDeceleration;
@@ -167,7 +227,6 @@ namespace TarodevController
                 _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, _frameInput.Move.x * _stats.MaxSpeed, _stats.Acceleration * Time.fixedDeltaTime);
             }
 
-            // 3D 增加：Z 轴处理（逻辑同 X 轴）
             if (_frameInput.Move.y == 0)
             {
                 var deceleration = _grounded ? _stats.GroundDeceleration : _stats.AirDeceleration;
@@ -185,7 +244,11 @@ namespace TarodevController
 
         private void HandleGravity()
         {
-            if (_grounded && _frameVelocity.y <= 0f)
+            if (_isWallSliding)
+            {
+                _frameVelocity.y = Mathf.MoveTowards(_frameVelocity.y, -_stats.WallSlideSpeed, _stats.FallAcceleration * Time.fixedDeltaTime);
+            }
+            else if (_grounded && _frameVelocity.y <= 0f)
             {
                 _frameVelocity.y = _stats.GroundingForce;
             }
@@ -207,6 +270,40 @@ namespace TarodevController
             if (_stats == null) Debug.LogWarning("Please assign a ScriptableStats asset", this);
         }
 #endif
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (_col == null || _stats == null) return;
+            // (保持之前的调试代码不变)
+            Vector3 inputDir = Vector3.zero;
+            if (_frameInput.Move.sqrMagnitude > 0.01f)
+            {
+                inputDir = new Vector3(_frameInput.Move.x, 0, _frameInput.Move.y).normalized;
+            }
+            if (inputDir == Vector3.zero) inputDir = transform.forward;
+            Vector3 colCenter = transform.position + _col.center;
+            float halfHeight = _col.height / 2f;
+            Vector3 point1 = colCenter + Vector3.up * (halfHeight - _col.radius - 0.1f);
+            Vector3 point2 = colCenter - Vector3.up * (halfHeight - _col.radius - 0.1f);
+
+            bool isHit = Physics.CapsuleCast(point1, point2, _col.radius, inputDir, out RaycastHit hit, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+
+            Gizmos.color = isHit ? Color.green : Color.red;
+            Gizmos.DrawWireSphere(point1, _col.radius);
+            Gizmos.DrawWireSphere(point2, _col.radius);
+            Vector3 endPoint = colCenter + inputDir * _stats.WallDetectionDistance;
+            Gizmos.DrawLine(colCenter, endPoint);
+            if (isHit)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawSphere(hit.point, 0.1f);
+                // [新增调试] 画出法线方向，方便看蹬墙跳的方向
+                Gizmos.color = Color.blue;
+                Gizmos.DrawRay(hit.point, hit.normal);
+            }
+        }
+#endif
     }
 
     public struct FrameInput
@@ -219,7 +316,6 @@ namespace TarodevController
     public interface IPlayerController
     {
         public event Action<bool, float> GroundedChanged;
-
         public event Action Jumped;
         public Vector2 FrameInput { get; }
     }
