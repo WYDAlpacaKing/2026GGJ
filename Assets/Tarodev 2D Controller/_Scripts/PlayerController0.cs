@@ -16,6 +16,7 @@ namespace TarodevController.old
         private float _springAssistTime;
         private float _springMaxUpSpeed;
         private float _springUpAcceleration;
+        private Vector3 _springDirection = Vector3.up;
 
         #region Interface
         public Vector2 FrameInput => _frameInput.Move;
@@ -48,7 +49,7 @@ namespace TarodevController.old
             {
                 JumpDown = Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.C),
                 JumpHeld = Input.GetButton("Jump") || Input.GetKey(KeyCode.C),
-                Move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
+                Move = new Vector2(Input.GetAxisRaw("Horizontal"), 0f)
             };
 
             if (_stats.SnapInput)
@@ -125,19 +126,20 @@ namespace TarodevController.old
             _isWallSliding = false;
 
             if (_grounded || _frameVelocity.y > 0) return;
-            if (_frameInput.Move.sqrMagnitude < 0.01f) return;
 
-            Vector3 inputDir = new Vector3(_frameInput.Move.x, 0, _frameInput.Move.y).normalized;
             Vector3 colCenter = transform.position + _col.center;
             float halfHeight = _col.height / 2f;
             float shrinkAmount = 0.1f;
             Vector3 point1 = colCenter + Vector3.up * (halfHeight - _col.radius - shrinkAmount);
             Vector3 point2 = colCenter - Vector3.up * (halfHeight - _col.radius - shrinkAmount);
 
-            if (Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, inputDir, out RaycastHit hit, _stats.WallDetectionDistance, _stats.ClimbableLayer))
+            bool hitRight = Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, Vector3.right, out RaycastHit hitR, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+            bool hitLeft = Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, Vector3.left, out RaycastHit hitL, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+
+            if (hitRight || hitLeft)
             {
                 _isWallSliding = true;
-                _wallHitNormal = hit.normal; // [����] �ؼ�����¼ǽ�ڵķ��߷���
+                _wallHitNormal = hitRight ? hitR.normal : hitL.normal; // [����] �ؼ�����¼ǽ�ڵķ��߷���
             }
         }
 
@@ -150,7 +152,7 @@ namespace TarodevController.old
         private bool _bufferedJumpUsable;
         private bool _endedJumpEarly;
         private bool _coyoteUsable;
-        private float _timeJumpWasPressed;
+        private float _timeJumpWasPressed = float.MinValue;
 
         private bool HasBufferedJump => _bufferedJumpUsable && _time < _timeJumpWasPressed + _stats.JumpBuffer;
         private bool CanUseCoyote => _coyoteUsable && !_grounded && _time < _frameLeftGrounded + _stats.CoyoteTime;
@@ -162,7 +164,7 @@ namespace TarodevController.old
             if (!_jumpToConsume && !HasBufferedJump) return;
 
             // [����] ��ǽ�����ȼ�������ͨ��Ծ
-            if (_isWallSliding)
+            if (_isWallSliding && _jumpToConsume)
             {
                 ExecuteWallJump();
                 _jumpToConsume = false;
@@ -220,11 +222,6 @@ namespace TarodevController.old
                 return;
             }
 
-            // [�Ż���ʾ]��
-            // �ڵ�ǽ�������ͨ�������̰���ǽ�ķ������
-            // ����� HandleDirection �����̲���һ��������ٶ�ȥ������ǽ����ˮƽ�ٶȡ�
-            // ������õ�ǽ��������Զ��������Ϊ����� AirAcceleration ̫���ˣ�������Ҫ���Ӷ��ݵġ�������������(Air Lock)����
-            // ��Ϊ�˱��ִ����࣬��ʱά��ԭ����
 
             if (_frameInput.Move.x == 0)
             {
@@ -253,14 +250,20 @@ namespace TarodevController.old
 
         private void HandleGravity()
         {
-            if (_springAssistTime > 0f && _frameVelocity.y > 0f)
+            if (_springAssistTime > 0f)
             {
                 _springAssistTime -= Time.fixedDeltaTime;
-                _frameVelocity.y = Mathf.MoveTowards(
-                    _frameVelocity.y,
-                    _springMaxUpSpeed,
-                    _springUpAcceleration * Time.fixedDeltaTime
-                );
+                Vector3 dir = _springDirection.sqrMagnitude > 0f ? _springDirection.normalized : Vector3.up;
+                float currentUpSpeed = Vector3.Dot(_frameVelocity, dir);
+                if (currentUpSpeed > 0f)
+                {
+                    float targetUpSpeed = Mathf.MoveTowards(
+                        currentUpSpeed,
+                        _springMaxUpSpeed,
+                        _springUpAcceleration * Time.fixedDeltaTime
+                    );
+                    _frameVelocity += dir * (targetUpSpeed - currentUpSpeed);
+                }
             }
 
             if (_isWallSliding)
@@ -295,6 +298,7 @@ namespace TarodevController.old
         }
 
         public void ApplySpringImpulse(
+            Vector3 direction,
             float force,
             float maxUpSpeed,
             float upAcceleration,
@@ -302,11 +306,17 @@ namespace TarodevController.old
             float ungroundTime,
             bool resetVelocity = true)
         {
-            AddFrameVelocity(Vector3.up * force, resetVelocity, ungroundTime);
+            Vector3 dir = direction.sqrMagnitude > 0f ? direction.normalized : Vector3.up;
+            _springDirection = dir;
+            AddFrameVelocity(dir * force, resetVelocity, ungroundTime);
 
             if (maxUpSpeed > 0f)
             {
-                _frameVelocity.y = Mathf.Min(_frameVelocity.y, maxUpSpeed);
+                float currentUpSpeed = Vector3.Dot(_frameVelocity, dir);
+                if (currentUpSpeed > maxUpSpeed)
+                {
+                    _frameVelocity -= dir * (currentUpSpeed - maxUpSpeed);
+                }
             }
 
             if (assistDuration > 0f && upAcceleration > 0f)
