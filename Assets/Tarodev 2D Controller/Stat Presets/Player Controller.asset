@@ -27,7 +27,7 @@ MonoBehaviour:
   AirDeceleration: 120
   GroundingForce: -1.5
   GrounderDistance: 0.05
-  WallSlideSpeed: 5.42
+  WallSlideSpeed: 4
   WallDetectionDistance: 0.13
   WallJumpHorizontalPower: 10
   WallJumpVerticalPower: 15
