@@ -132,6 +132,7 @@ public class RevealableChargedSpring : BaseRevealableBlock
             if (hit.TryGetComponent(out PlayerController0 controller))
             {
                 controller.ApplySpringImpulse(
+                    dir,
                     force,
                     _config.MaxUpSpeed,
                     _config.UpAcceleration,
@@ -157,6 +158,7 @@ public class RevealableChargedSpring : BaseRevealableBlock
         if (collision.collider.TryGetComponent(out PlayerController0 controller))
         {
             controller.ApplySpringImpulse(
+                dir,
                 _config.InactiveBounceForce,
                 _config.MaxUpSpeed,
                 _config.UpAcceleration,

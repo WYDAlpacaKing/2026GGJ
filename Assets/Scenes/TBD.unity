@@ -955,7 +955,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 58.3
-  orthographic: 1
+  orthographic: 0
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -36650,11 +36650,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4158669620311766119, guid: 23c6d1ae35a67044583787cd0632ad71, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 11.98
+      value: 15.16
       objectReference: {fileID: 0}
     - target: {fileID: 4158669620311766119, guid: 23c6d1ae35a67044583787cd0632ad71, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.97
+      value: -0.22
       objectReference: {fileID: 0}
     - target: {fileID: 4158669620311766119, guid: 23c6d1ae35a67044583787cd0632ad71, type: 3}
       propertyPath: m_LocalPosition.z
@@ -36662,19 +36662,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4158669620311766119, guid: 23c6d1ae35a67044583787cd0632ad71, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.89731675
       objectReference: {fileID: 0}
     - target: {fileID: 4158669620311766119, guid: 23c6d1ae35a67044583787cd0632ad71, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4158669620311766119, guid: 23c6d1ae35a67044583787cd0632ad71, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4158669620311766119, guid: 23c6d1ae35a67044583787cd0632ad71, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: 0.44138703
       objectReference: {fileID: 0}
     - target: {fileID: 4158669620311766119, guid: 23c6d1ae35a67044583787cd0632ad71, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -36686,7 +36686,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4158669620311766119, guid: 23c6d1ae35a67044583787cd0632ad71, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 52.385
       objectReference: {fileID: 0}
     - target: {fileID: 7875982917972710256, guid: 23c6d1ae35a67044583787cd0632ad71, type: 3}
       propertyPath: m_Name

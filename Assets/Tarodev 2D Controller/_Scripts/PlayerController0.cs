@@ -16,6 +16,7 @@ namespace TarodevController.old
         private float _springAssistTime;
         private float _springMaxUpSpeed;
         private float _springUpAcceleration;
+        private Vector3 _springDirection = Vector3.up;
 
         #region Interface
         public Vector2 FrameInput => _frameInput.Move;
@@ -254,14 +255,20 @@ namespace TarodevController.old
 
         private void HandleGravity()
         {
-            if (_springAssistTime > 0f && _frameVelocity.y > 0f)
+            if (_springAssistTime > 0f)
             {
                 _springAssistTime -= Time.fixedDeltaTime;
-                _frameVelocity.y = Mathf.MoveTowards(
-                    _frameVelocity.y,
-                    _springMaxUpSpeed,
-                    _springUpAcceleration * Time.fixedDeltaTime
-                );
+                Vector3 dir = _springDirection.sqrMagnitude > 0f ? _springDirection.normalized : Vector3.up;
+                float currentUpSpeed = Vector3.Dot(_frameVelocity, dir);
+                if (currentUpSpeed > 0f)
+                {
+                    float targetUpSpeed = Mathf.MoveTowards(
+                        currentUpSpeed,
+                        _springMaxUpSpeed,
+                        _springUpAcceleration * Time.fixedDeltaTime
+                    );
+                    _frameVelocity += dir * (targetUpSpeed - currentUpSpeed);
+                }
             }
 
             if (_isWallSliding)
@@ -296,6 +303,7 @@ namespace TarodevController.old
         }
 
         public void ApplySpringImpulse(
+            Vector3 direction,
             float force,
             float maxUpSpeed,
             float upAcceleration,
@@ -303,11 +311,17 @@ namespace TarodevController.old
             float ungroundTime,
             bool resetVelocity = true)
         {
-            AddFrameVelocity(Vector3.up * force, resetVelocity, ungroundTime);
+            Vector3 dir = direction.sqrMagnitude > 0f ? direction.normalized : Vector3.up;
+            _springDirection = dir;
+            AddFrameVelocity(dir * force, resetVelocity, ungroundTime);
 
             if (maxUpSpeed > 0f)
             {
-                _frameVelocity.y = Mathf.Min(_frameVelocity.y, maxUpSpeed);
+                float currentUpSpeed = Vector3.Dot(_frameVelocity, dir);
+                if (currentUpSpeed > maxUpSpeed)
+                {
+                    _frameVelocity -= dir * (currentUpSpeed - maxUpSpeed);
+                }
             }
 
             if (assistDuration > 0f && upAcceleration > 0f)
