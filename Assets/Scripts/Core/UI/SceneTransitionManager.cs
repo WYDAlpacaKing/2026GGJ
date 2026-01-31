@@ -1,20 +1,20 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using DG.Tweening; // ÒýÈë DOTween ÃüÃû¿Õ¼ä
+using DG.Tweening; // ï¿½ï¿½ï¿½ï¿½ DOTween ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½
 
 public class SceneTransitionManager : MonoBehaviour
 {
     public static SceneTransitionManager Instance;
 
-    [Header("UI ×é¼þ")]
-    public CanvasGroup gameUICanvasGroup; // ÓÎÏ·ÀïµÄÖ÷UI£¬ÓÃÓÚ¹ý³¡Ê±½¥Òþ
-    public RectTransform circleWipe;      // ÄÇ¸öÔ²ÐÎµÄºÚÉ« Image
-    public Image blackBackground;         // ±³¾°ºÚµ×£¨¿ÉÑ¡£¬ÓÃÓÚµþµ×£©
+    [Header("UI ï¿½ï¿½ï¿½")]
+    public CanvasGroup gameUICanvasGroup; // ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½UIï¿½ï¿½ï¿½ï¿½ï¿½Ú¹ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½
+    public RectTransform circleWipe;      // ï¿½Ç¸ï¿½Ô²ï¿½ÎµÄºï¿½É« Image
+    public Image blackBackground;         // ï¿½ï¿½ï¿½ï¿½ï¿½Úµ×£ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½×£ï¿½
 
-    [Header("ÉèÖÃ")]
-    public float duration = 1f;           // ¶¯»­Ê±³¤
-    public float maxScale = 25f;          // Ô²ÐÎ·Å´ó¶àÉÙ±¶ÄÜ¸Ç×¡È«ÆÁ (¸ù¾ÝÆÁÄ»ÊÊÅäµ÷Õû)
+    [Header("ï¿½ï¿½ï¿½ï¿½")]
+    public float duration = 1f;           // ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+    public float maxScale = 25f;          // Ô²ï¿½Î·Å´ï¿½ï¿½ï¿½Ù±ï¿½ï¿½Ü¸ï¿½×¡È«ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 
     private void Awake()
     {
@@ -28,102 +28,112 @@ public class SceneTransitionManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        // ³õÊ¼»¯×´Ì¬£ºÔ²È¦ÉèÎª0£¬±³¾°È«Í¸Ã÷
+        // ï¿½ï¿½Ê¼ï¿½ï¿½×´Ì¬ï¿½ï¿½Ô²È¦ï¿½ï¿½Îª0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«Í¸ï¿½ï¿½
         if (circleWipe) circleWipe.localScale = Vector3.zero;
         if (blackBackground) blackBackground.color = new Color(0, 0, 0, 0);
     }
 
     /// <summary>
-    /// ¼ÓÔØÏÂÒ»¹Ø
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
     /// </summary>
     public void LoadNextLevel()
     {
         int nextIndex = SceneManager.GetActiveScene().buildIndex + 1;
-        if (nextIndex >= SceneManager.sceneCountInBuildSettings) nextIndex = 0;
+        if (nextIndex >= SceneManager.sceneCountInBuildSettings)
+        {
+            Debug.LogWarning("Next level not found in Build Settings. Reloading current level instead.");
+            RestartLevel();
+            return;
+        }
 
         StartCoroutine(TransitionSequence(nextIndex));
     }
 
     /// <summary>
-    /// ÖØÐÂ¿ªÊ¼µ±Ç°¹Ø¿¨
+    /// ï¿½ï¿½ï¿½Â¿ï¿½Ê¼ï¿½ï¿½Ç°ï¿½Ø¿ï¿½
     /// </summary>
     public void RestartLevel()
     {
         int currentIndex = SceneManager.GetActiveScene().buildIndex;
+        if (currentIndex < 0 || currentIndex >= SceneManager.sceneCountInBuildSettings)
+        {
+            Debug.LogWarning("Current level not found in Build Settings. Restart skipped.");
+            return;
+        }
         StartCoroutine(TransitionSequence(currentIndex));
     }
 
-    // Ê¹ÓÃÐ­³ÌÀ´Çý¶¯ DOTween µÄ Sequence£¬·½±ãÂß¼­¹ÜÀí
+    // Ê¹ï¿½ï¿½Ð­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ DOTween ï¿½ï¿½ Sequenceï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½
     private System.Collections.IEnumerator TransitionSequence(int targetSceneIndex)
     {
-        // 1. ´´½¨ DOTween ÐòÁÐ
+        // 1. ï¿½ï¿½ï¿½ï¿½ DOTween ï¿½ï¿½ï¿½ï¿½
         Sequence seq = DOTween.Sequence();
 
-        // --- ½ø³¡¶¯»­ ---
+        // --- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ---
 
-        // A. ÔÝÍ£ÓÎÏ·Âß¼­ (·ÀÖ¹Íæ¼ÒÔÚ×ª³¡Ê±Ï¹¶¯)
+        // A. ï¿½ï¿½Í£ï¿½ï¿½Ï·ï¿½ß¼ï¿½ (ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½Ê±Ï¹ï¿½ï¿½)
         seq.AppendCallback(() => {
             // PlayerController.Instance.SetInput(false); 
         });
 
-        // B. ÓÎÏ·UI½¥Òþ (Èç¹ûÓÐÒýÓÃµÄ»°)
+        // B. ï¿½ï¿½Ï·UIï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÃµÄ»ï¿½)
         if (gameUICanvasGroup != null)
         {
             seq.Join(gameUICanvasGroup.DOFade(0, 0.5f));
         }
 
-        // C. ºÚÉ«Ô²È¦´ÓÐ¡±ä´ó -> ÕÚ×¡ÆÁÄ»
-        // SetEase ÉèÎª InOutQuad »á±È½ÏË³»¬
+        // C. ï¿½ï¿½É«Ô²È¦ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ -> ï¿½ï¿½×¡ï¿½ï¿½Ä»
+        // SetEase ï¿½ï¿½Îª InOutQuad ï¿½ï¿½È½ï¿½Ë³ï¿½ï¿½
         seq.Append(circleWipe.DOScale(maxScale, duration).SetEase(Ease.InOutQuad));
 
-        // D. Ë³±ã°Ñ±³¾°Ò²ÅªºÚ£¬·ÀÖ¹Ô²È¦±ßÔµÓÐ·ìÏ¶
+        // D. Ë³ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½Ò²Åªï¿½Ú£ï¿½ï¿½ï¿½Ö¹Ô²È¦ï¿½ï¿½Ôµï¿½Ð·ï¿½Ï¶
         if (blackBackground)
         {
             seq.Join(blackBackground.DOFade(1, duration));
         }
 
-        // --- µÈ´ý Sequence ²¥·ÅÍê½ø³¡¶¯»­ ---
+        // --- ï¿½È´ï¿½ Sequence ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ---
         yield return seq.WaitForCompletion();
 
-        // --- ÕÚµ²ÆÚ¼äµÄ²Ù×÷ (×î¹Ø¼üµÄÒ»²½) ---
+        // --- ï¿½Úµï¿½ï¿½Ú¼ï¿½Ä²ï¿½ï¿½ï¿½ (ï¿½ï¿½Ø¼ï¿½ï¿½ï¿½Ò»ï¿½ï¿½) ---
 
-        // 2. ¼ÓÔØ³¡¾° / ÖØÖÃÎ»ÖÃ
-        // Ö±½Ó Reload Scene ÊÇ×î³¹µ×µÄ¡°¸´Ô­ÎïÌåÎ»ÖÃ¡±·½·¨
+        // 2. ï¿½ï¿½ï¿½Ø³ï¿½ï¿½ï¿½ / ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+        // Ö±ï¿½ï¿½ Reload Scene ï¿½ï¿½ï¿½î³¹ï¿½×µÄ¡ï¿½ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã¡ï¿½ï¿½ï¿½ï¿½ï¿½
         AsyncOperation op = SceneManager.LoadSceneAsync(targetSceneIndex);
         op.allowSceneActivation = false;
 
-        // µÈ´ý¼ÓÔØÍê³É£¨´ËÊ±ÆÁÄ»ÊÇÈ«ºÚµÄ£©
+        // ï¿½È´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ä»ï¿½ï¿½È«ï¿½ÚµÄ£ï¿½
         while (op.progress < 0.9f) yield return null;
         op.allowSceneActivation = true;
 
-        // µÈÒ»Ö¡ÈÃ Start ·½·¨Ö´ÐÐ
+        // ï¿½ï¿½Ò»Ö¡ï¿½ï¿½ Start ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½
         yield return null;
 
-        // ¡¾À©Õ¹¡¿Èç¹ûÄã²»ÊÇ Reload ³¡¾°£¬¶øÊÇÏëÊÖ¶¯¸´Ô­ÎïÌåÎ»ÖÃ£¬´úÂëÐ´ÔÚÕâÀï£º
+        // ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã²»ï¿½ï¿½ Reload ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï£º
         // FindObjectOfType<PlayerController>().ResetPosition();
 
-        // ÖØÐÂ»ñÈ¡ÐÂ³¡¾°µÄ UI CanvasGroup (ÒòÎª³¡¾°¼ÓÔØºóÒýÓÃ»á¶ªÊ§)
-        // ÕâÒ»²½ÐèÒªÄãµÄÓÎÏ·¼Ü¹¹Ö§³Ö£¬±ÈÈç GameObject.Find »òÕßµ¥Àý
+        // ï¿½ï¿½ï¿½Â»ï¿½È¡ï¿½Â³ï¿½ï¿½ï¿½ï¿½ï¿½ UI CanvasGroup (ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øºï¿½ï¿½ï¿½ï¿½Ã»á¶ªÊ§)
+        // ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½Ü¹ï¿½Ö§ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½ GameObject.Find ï¿½ï¿½ï¿½ßµï¿½ï¿½ï¿½
         // SetupNewSceneUI(); 
 
-        // --- ³ö³¡¶¯»­ ---
+        // --- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ---
 
         Sequence seqOut = DOTween.Sequence();
 
-        // E. ºÚÉ«Ô²È¦´Ó´ó±äÐ¡ -> Â¶³öÆÁÄ»
+        // E. ï¿½ï¿½É«Ô²È¦ï¿½Ó´ï¿½ï¿½Ð¡ -> Â¶ï¿½ï¿½ï¿½ï¿½Ä»
         seqOut.Append(circleWipe.DOScale(0, duration).SetEase(Ease.OutQuad));
 
-        // F. ±³¾°µ­³ö
+        // F. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (blackBackground)
         {
             seqOut.Join(blackBackground.DOFade(0, duration));
         }
 
-        // G. ÓÎÏ·UIµ­Èë
-        // ×¢Òâ£ºÕâÀïÐèÒªÄãÖØÐÂ»ñÈ¡ÁËÐÂ³¡¾°µÄ gameUICanvasGroup ²ÅÄÜÉúÐ§
+        // G. ï¿½ï¿½Ï·UIï¿½ï¿½ï¿½ï¿½
+        // ×¢ï¿½â£ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Â»ï¿½È¡ï¿½ï¿½ï¿½Â³ï¿½ï¿½ï¿½ï¿½ï¿½ gameUICanvasGroup ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§
         // seqOut.Join(newGameUI.DOFade(1, 0.5f));
 
-        // H. »Ö¸´ÊäÈë
+        // H. ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½
         seqOut.OnComplete(() => {
             // PlayerController.Instance.SetInput(true);
         });
