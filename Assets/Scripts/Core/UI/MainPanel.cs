@@ -10,6 +10,7 @@ public class MainPanel : BasePanel
     [SerializeField] private Button btnStart;
     [SerializeField] private Button btnSettings;
     [SerializeField] private Button btnQuit;
+    [SerializeField] private Button btnToturial;
     private bool _waitingForScene;
 
     // ��д����� OnInit��ֻ�ڵ�һ�μ���ʱִ��
@@ -39,6 +40,11 @@ public class MainPanel : BasePanel
             PlayClickSound();
             QuitGame();
         });
+
+        btnToturial.onClick.AddListener(() =>
+        {
+            GOTOToturial();
+        });
     }
 
     /// <summary>
@@ -60,25 +66,19 @@ public class MainPanel : BasePanel
 
     private void StartGame()
     {
-        Debug.Log("��ʼ��Ϸ����...");
         MusicMgr.Instance.StopBgMusic();
         MusicMgr.Instance.PlayBgMusic(AudioID.BGM_playing);
-        if (!_waitingForScene)
-        {
-            _waitingForScene = true;
-            SceneManager.sceneLoaded += OnSceneLoaded;
-        }
-        SceneManager.LoadScene("Art_L1");
+        SceneTransitionManager.Instance.LoadSpecificScene(2);
         UIManager.Instance.Back();
         CloseSelf();
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+
+    private void GOTOToturial()
     {
-        if (scene.name != "Art_L1") return;
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-        _waitingForScene = false;
-        GameManager.Instance.StartGame();
+        SceneTransitionManager.Instance.LoadSpecificScene(1);
+        UIManager.Instance.Back();
+        GameManager.Instance.CursorLock();
     }
 
     private void QuitGame()
