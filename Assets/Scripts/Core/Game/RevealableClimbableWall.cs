@@ -14,6 +14,7 @@ public class RevealableClimbableWall : BaseRevealableBlock
     {
         base.Awake();
         _cachedLayer = gameObject.layer;
+        _solidCollider.isTrigger = true;
     }
 
     protected override void Update()
@@ -33,7 +34,6 @@ public class RevealableClimbableWall : BaseRevealableBlock
         {
             OnFullyRevealed();
             _solidCollider.isTrigger = false;
-
         }
     }
 
