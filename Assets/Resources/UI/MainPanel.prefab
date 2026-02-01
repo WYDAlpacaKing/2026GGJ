@@ -1534,6 +1534,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ffc336ace0b8447bc3d3e291ea4621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  btnStart: {fileID: 0}
-  btnSettings: {fileID: 0}
-  btnQuit: {fileID: 0}
+  btnStart: {fileID: 7492103606111340191}
+  btnSettings: {fileID: 4245436864611362957}
+  btnQuit: {fileID: 8029813737597281370}

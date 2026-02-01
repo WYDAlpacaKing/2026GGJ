@@ -63,13 +63,11 @@ public class GameManager : BaseMonoMgr<GameManager>
 
     public void CursorLock()
     {
-        Cursor.lockState = CursorLockMode.Locked;   // Ëø¶¨¹â±ê
         Cursor.visible = false;
     }
 
     public void UnlockCursor()
     {
-        Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 }
