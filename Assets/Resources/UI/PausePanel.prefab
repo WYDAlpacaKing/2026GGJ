@@ -153,7 +153,7 @@ GameObject:
   - component: {fileID: 5035956235090658602}
   - component: {fileID: 301575237772496578}
   m_Layer: 0
-  m_Name: ContinueButton (1)
+  m_Name: RestartButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -290,9 +290,9 @@ GameObject:
   - component: {fileID: 908702414694898209}
   - component: {fileID: 4748797699284057097}
   - component: {fileID: 438750348088098604}
-  - component: {fileID: 842853664775957370}
+  - component: {fileID: 2131065386249822105}
   m_Layer: 5
-  m_Name: PausePannel
+  m_Name: PausePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -370,7 +370,7 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &842853664775957370
+--- !u!114 &2131065386249822105
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -379,12 +379,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4873541484594700362}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dde7db2deeb026a4a934ae3dfabfa521, type: 3}
+  m_Script: {fileID: 11500000, guid: c1d8c1c0173d28c4cbe2df7080d6fa81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  btnClose: {fileID: 0}
-  sliderBGM: {fileID: 0}
-  sliderSFX: {fileID: 0}
+  btnContinue: {fileID: 3842537062777831}
+  btnRestart: {fileID: 5035956235090658602}
+  btnHome: {fileID: 2856927252529187604}
 --- !u!1 &5012154747949859730
 GameObject:
   m_ObjectHideFlags: 0
@@ -935,7 +935,7 @@ GameObject:
   - component: {fileID: 2856927252529187604}
   - component: {fileID: 5344868550937709037}
   m_Layer: 0
-  m_Name: ContinueButton (2)
+  m_Name: HomeButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

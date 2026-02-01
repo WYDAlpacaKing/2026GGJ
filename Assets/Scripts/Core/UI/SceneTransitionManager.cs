@@ -71,6 +71,8 @@ public class SceneTransitionManager : MonoBehaviour
         StartCoroutine(TransitionSequence(currentIndex));
     }
 
+
+
     // ʹ��Э�������� DOTween �� Sequence�������߼�����
     private System.Collections.IEnumerator TransitionSequence(int targetSceneIndex)
     {
