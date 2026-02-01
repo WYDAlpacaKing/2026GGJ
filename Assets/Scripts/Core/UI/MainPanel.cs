@@ -63,6 +63,7 @@ public class MainPanel : BasePanel
         MusicMgr.Instance.StopBgMusic();
         MusicMgr.Instance.PlayBgMusic(AudioID.BGM_playing);
         SceneManager.LoadScene("Art_L1");
+        GameManager.Instance.StartGame();
         CloseSelf();
     }
 

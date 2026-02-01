@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class SettingsPanel : BasePanel
 {
     [Header("--- UI 组件引用 ---")]
-    [Tooltip("关闭/返回按钮")]
-    [SerializeField] private Button btnClose;
+    //[Tooltip("关闭/返回按钮")]
+    //[SerializeField] private Button btnClose;
 
     [Tooltip("背景音乐音量滑条")]
     [SerializeField] private Slider sliderBGM;
@@ -25,11 +25,11 @@ public class SettingsPanel : BasePanel
         base.Init(args);
 
         // 1. 绑定关闭按钮
-        btnClose.onClick.AddListener(() =>
-        {
-            PlayClickSound();
-            UIManager.Instance.Back();
-        });
+        //btnClose.onClick.AddListener(() =>
+        //{
+        //    PlayClickSound();
+        //    UIManager.Instance.Back();
+        //});
 
         // 2. 绑定 BGM 滑条
         sliderBGM.onValueChanged.AddListener((value) =>
@@ -59,6 +59,14 @@ public class SettingsPanel : BasePanel
 
         sliderBGM.value = MusicMgr.Instance.MusicVolume;
         sliderSFX.value = MusicMgr.Instance.SoundVolume;
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            UIManager.Instance.Back();
+        }
     }
 
     private void PlayClickSound()

@@ -12,6 +12,7 @@ public class Destination : MonoBehaviour
             if(SceneManager.GetActiveScene().buildIndex == SceneManager.sceneCountInBuildSettings - 1)
             {
                 SceneTransitionManager.Instance.LoadSpecificScene(0);
+                GameManager.Instance.ReturnToMainMenu();
             }
             else
             {
