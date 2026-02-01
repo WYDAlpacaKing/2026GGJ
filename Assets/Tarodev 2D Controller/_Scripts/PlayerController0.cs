@@ -17,6 +17,7 @@ namespace TarodevController.old
         private float _springMaxUpSpeed;
         private float _springUpAcceleration;
         private Vector3 _springDirection = Vector3.up;
+        private float _lockedZ;
 
         #region Interface
         public Vector2 FrameInput => _frameInput.Move;
@@ -35,6 +36,7 @@ namespace TarodevController.old
 
             _rb.constraints = RigidbodyConstraints.FreezeRotation;
             _cachedQueryStartInColliders = Physics.queriesHitTriggers;
+            _lockedZ = transform.position.z;
         }
 
         private void Update()
@@ -67,6 +69,7 @@ namespace TarodevController.old
 
         private void FixedUpdate()
         {
+            LockZAxis();
             CheckCollisions();
             CheckWallSlide();
 
@@ -285,6 +288,21 @@ namespace TarodevController.old
         #endregion
 
         private void ApplyMovement() => _rb.linearVelocity = _frameVelocity;
+
+        private void LockZAxis()
+        {
+            _frameVelocity.z = 0f;
+            if (_rb != null)
+            {
+                Vector3 v = _rb.linearVelocity;
+                v.z = 0f;
+                _rb.linearVelocity = v;
+
+                Vector3 p = _rb.position;
+                p.z = _lockedZ;
+                _rb.position = p;
+            }
+        }
 
         public void AddFrameVelocity(Vector3 velocityChange, bool resetVelocity = false, float ungroundTime = 0.1f)
         {
