@@ -1,5 +1,6 @@
 using UnityEngine;
 using TarodevController.old;
+using Alpaca.Game.Audio;
 
 public class RevealableChargedSpring : BaseRevealableBlock
 {
@@ -41,11 +42,17 @@ public class RevealableChargedSpring : BaseRevealableBlock
 
         bool isInteracting = IsInteracting();
         bool releasedThisFrame = _wasInteracting && !isInteracting;
+        bool startedInteracting = !_wasInteracting && isInteracting;
 
         UpdateChargeTime(isInteracting);
         if (isInteracting)
         {
             _lastCompressionRatio = GetCompressionRatio();
+        }
+
+        if (startedInteracting)
+        {
+            MusicMgr.Instance?.PlaySound(AudioID.SFX_spring_hold);
         }
 
         if (releasedThisFrame)
@@ -75,6 +82,8 @@ public class RevealableChargedSpring : BaseRevealableBlock
     private void ReleaseSpring(float compressionRatio)
     {
         if (_config == null) return;
+
+        MusicMgr.Instance?.PlaySound(AudioID.SFX_spring_release);
 
         float compressionAmount = Mathf.Clamp01(compressionRatio) * Mathf.Clamp01(_config.MaxCompressionRatio);
         float releaseValue = _config.ForceCoefficient * compressionAmount;
