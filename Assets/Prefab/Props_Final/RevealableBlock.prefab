@@ -52,7 +52,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 71366129303770510}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -129,6 +129,18 @@ MonoBehaviour:
   _hiddenColor: {r: 1, g: 0.818261, b: 0, a: 0.9137255}
   _visibleColor: {r: 1, g: 1, b: 1, a: 1}
   _colorPropertyName: _BaseColor
+  _emissionRenderer: {fileID: 0}
+  _emissionPropertyName: _EmissionColor
+  _emissionColor: {r: 1, g: 1, b: 1, a: 1}
+  _emissionIntensityFrom: 0
+  _emissionIntensityTo: 2
+  _particleEffects:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _particleScaleFrom: {x: 1, y: 1, z: 1}
+  _particleScaleTo: {x: 1.5, y: 1.5, z: 1.5}
 --- !u!1 &1496356639427237424
 GameObject:
   m_ObjectHideFlags: 0
