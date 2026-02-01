@@ -18,7 +18,7 @@ MonoBehaviour:
   VisualReturnSpeed: 8
   ReleaseForceMode: 0
   ReleaseWindowTime: 0.15
-  DebugLog: 1
+  DebugLog: 0
   MaxUpSpeed: 283.2
   UpAcceleration: 2
   AssistDuration: 0.2

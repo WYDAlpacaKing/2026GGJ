@@ -5890,14 +5890,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: RevealableBlock (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 2114517147833066286, guid: 8122c40b8023dd741a1dc11a093cdc26, type: 3}
-      propertyPath: 'm_Materials.Array.data[0]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 49a10892d91714c49a8360065a3639c8, type: 2}
-    - target: {fileID: 6227283711896865543, guid: 8122c40b8023dd741a1dc11a093cdc26, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6503847624345950603, guid: 8122c40b8023dd741a1dc11a093cdc26, type: 3}
       propertyPath: m_LocalPosition.x
       value: 17.5
@@ -5937,18 +5929,6 @@ PrefabInstance:
     - target: {fileID: 6503847624345950603, guid: 8122c40b8023dd741a1dc11a093cdc26, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7280776013197387883, guid: 8122c40b8023dd741a1dc11a093cdc26, type: 3}
-      propertyPath: _emissionColor.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7705134511298988820, guid: 8122c40b8023dd741a1dc11a093cdc26, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8462679731897396308, guid: 8122c40b8023dd741a1dc11a093cdc26, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -43259,12 +43239,20 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1615880084742776885, guid: ec0094563f3ef9644af21496ef39b783, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4299827311438034980, guid: ec0094563f3ef9644af21496ef39b783, type: 3}
       propertyPath: m_Name
       value: Player Controller
       objectReference: {fileID: 0}
     - target: {fileID: 7738588266294169423, guid: ec0094563f3ef9644af21496ef39b783, type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8005831242659234543, guid: ec0094563f3ef9644af21496ef39b783, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
