@@ -213,7 +213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9392aacf3349be549bb1fd9eece49154, type: 3}
   m_Name: ButoVolumetricFog
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   mode:
     m_OverrideState: 1
     m_Value: 1
@@ -225,7 +225,7 @@ MonoBehaviour:
     m_Value: 3
   gridSizeZ:
     m_OverrideState: 1
-    m_Value: 127
+    m_Value: 76
   maxDistanceVolumetric:
     m_OverrideState: 1
     m_Value: 68.37
@@ -240,10 +240,10 @@ MonoBehaviour:
     m_Value: 0.05
   fogDensity:
     m_OverrideState: 1
-    m_Value: 3.1
+    m_Value: 1.89
   anisotropy:
     m_OverrideState: 1
-    m_Value: 0.2
+    m_Value: -0.47
   lightIntensity:
     m_OverrideState: 0
     m_Value: 1
