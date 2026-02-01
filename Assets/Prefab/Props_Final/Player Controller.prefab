@@ -34714,9 +34714,33 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 701398147531183446}
     m_Modifications:
+    - target: {fileID: 308547013194941489, guid: cf8a958ffd187c04cafcea01faf4f74f, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.atime2
+      value: 34952
+      objectReference: {fileID: 0}
+    - target: {fileID: 308547013194941489, guid: cf8a958ffd187c04cafcea01faf4f74f, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key1.a
+      value: 0.05882353
+      objectReference: {fileID: 0}
+    - target: {fileID: 308547013194941489, guid: cf8a958ffd187c04cafcea01faf4f74f, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key2.a
+      value: 0.078431375
+      objectReference: {fileID: 0}
     - target: {fileID: 1012024367132826614, guid: cf8a958ffd187c04cafcea01faf4f74f, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 2208355884638919930, guid: cf8a958ffd187c04cafcea01faf4f74f, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.ctime1
+      value: 65535
+      objectReference: {fileID: 0}
+    - target: {fileID: 2208355884638919930, guid: cf8a958ffd187c04cafcea01faf4f74f, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key1.a
+      value: 0.07058824
+      objectReference: {fileID: 0}
+    - target: {fileID: 2208355884638919930, guid: cf8a958ffd187c04cafcea01faf4f74f, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key2.a
+      value: 0.12156863
       objectReference: {fileID: 0}
     - target: {fileID: 5366099036513437305, guid: cf8a958ffd187c04cafcea01faf4f74f, type: 3}
       propertyPath: m_LocalScale.x
