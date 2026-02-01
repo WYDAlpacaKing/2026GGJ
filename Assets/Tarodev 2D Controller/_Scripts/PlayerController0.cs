@@ -17,6 +17,7 @@ namespace TarodevController.old
         private float _springMaxUpSpeed;
         private float _springUpAcceleration;
         private Vector3 _springDirection = Vector3.up;
+        private float _lockedZ;
 
         #region Interface
         public Vector2 FrameInput => _frameInput.Move;
@@ -35,6 +36,7 @@ namespace TarodevController.old
 
             _rb.constraints = RigidbodyConstraints.FreezeRotation;
             _cachedQueryStartInColliders = Physics.queriesHitTriggers;
+            _lockedZ = transform.position.z;
         }
 
         private void Update()
@@ -67,6 +69,7 @@ namespace TarodevController.old
 
         private void FixedUpdate()
         {
+            LockZAxis();
             CheckCollisions();
             CheckWallSlide();
 
@@ -133,8 +136,27 @@ namespace TarodevController.old
             Vector3 point1 = colCenter + Vector3.up * (halfHeight - _col.radius - shrinkAmount);
             Vector3 point2 = colCenter - Vector3.up * (halfHeight - _col.radius - shrinkAmount);
 
-            bool hitRight = Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, Vector3.right, out RaycastHit hitR, _stats.WallDetectionDistance, _stats.ClimbableLayer);
-            bool hitLeft = Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, Vector3.left, out RaycastHit hitL, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+            float checkRadius = _col.radius - 0.05f;
+            bool hitRight = Physics.CapsuleCast(point1, point2, checkRadius, Vector3.right, out RaycastHit hitR, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+            bool hitLeft = Physics.CapsuleCast(point1, point2, checkRadius, Vector3.left, out RaycastHit hitL, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+
+            if (!hitRight && !hitLeft)
+            {
+                Vector3 rightOffset = Vector3.right * (_stats.WallDetectionDistance + 0.01f);
+                Vector3 leftOffset = Vector3.left * (_stats.WallDetectionDistance + 0.01f);
+                hitRight = Physics.CheckCapsule(point1 + rightOffset, point2 + rightOffset, checkRadius, _stats.ClimbableLayer);
+                hitLeft = Physics.CheckCapsule(point1 + leftOffset, point2 + leftOffset, checkRadius, _stats.ClimbableLayer);
+                if (hitRight)
+                {
+                    hitR = default;
+                    hitR.normal = Vector3.left;
+                }
+                else if (hitLeft)
+                {
+                    hitL = default;
+                    hitL.normal = Vector3.right;
+                }
+            }
 
             if (hitRight || hitLeft)
             {
@@ -286,6 +308,21 @@ namespace TarodevController.old
 
         private void ApplyMovement() => _rb.linearVelocity = _frameVelocity;
 
+        private void LockZAxis()
+        {
+            _frameVelocity.z = 0f;
+            if (_rb != null)
+            {
+                Vector3 v = _rb.linearVelocity;
+                v.z = 0f;
+                _rb.linearVelocity = v;
+
+                Vector3 p = _rb.position;
+                p.z = _lockedZ;
+                _rb.position = p;
+            }
+        }
+
         public void AddFrameVelocity(Vector3 velocityChange, bool resetVelocity = false, float ungroundTime = 0.1f)
         {
             if (resetVelocity) _frameVelocity = Vector3.zero;
@@ -294,6 +331,30 @@ namespace TarodevController.old
             if (velocityChange.y > 0f && ungroundTime > 0f)
             {
                 _forceUngroundTime = Mathf.Max(_forceUngroundTime, _time + ungroundTime);
+            }
+        }
+
+        public void SetVelocityAlongDirection(Vector3 direction, float speed, float ungroundTime = 0.1f)
+        {
+            Vector3 dir = direction.sqrMagnitude > 0f ? direction.normalized : Vector3.up;
+            float current = Vector3.Dot(_frameVelocity, dir);
+            _frameVelocity += dir * (speed - current);
+
+            if (ungroundTime > 0f)
+            {
+                _forceUngroundTime = Mathf.Max(_forceUngroundTime, _time + ungroundTime);
+            }
+            Debug.Log($"[PlayerController0] SetVelocityAlongDirection speed={speed:F2} unground={ungroundTime:F2}", this);
+        }
+
+        public void ZeroZVelocity()
+        {
+            _frameVelocity.z = 0f;
+            if (_rb != null)
+            {
+                Vector3 v = _rb.linearVelocity;
+                v.z = 0f;
+                _rb.linearVelocity = v;
             }
         }
 
@@ -310,6 +371,11 @@ namespace TarodevController.old
             _springDirection = dir;
             AddFrameVelocity(dir * force, resetVelocity, ungroundTime);
 
+            if (ungroundTime > 0f)
+            {
+                _forceUngroundTime = Mathf.Max(_forceUngroundTime, _time + ungroundTime);
+            }
+
             if (maxUpSpeed > 0f)
             {
                 float currentUpSpeed = Vector3.Dot(_frameVelocity, dir);
@@ -325,6 +391,7 @@ namespace TarodevController.old
                 _springUpAcceleration = upAcceleration;
                 _springAssistTime = Mathf.Max(_springAssistTime, assistDuration);
             }
+            Debug.Log($"[PlayerController0] ApplySpringImpulse force={force:F2} maxUp={maxUpSpeed:F2} unground={ungroundTime:F2}", this);
         }
 
 #if UNITY_EDITOR

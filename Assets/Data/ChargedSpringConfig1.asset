@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dc8fe5a5e0e449479a248eecf1da720, type: 3}
   m_Name: ChargedSpringConfig1
   m_EditorClassIdentifier: 
-  InactiveBounceForce: 2
-  MaxUpSpeed: 40
+  CompressToMaxTime: 0.3
+  ForceCoefficient: 200
+  MaxCompressionRatio: 0.3
+  VisualReturnSpeed: 8
+  ReleaseForceMode: 0
+  ReleaseWindowTime: 0.15
+  DebugLog: 0
+  MaxUpSpeed: 283.2
   UpAcceleration: 2
   AssistDuration: 0.2
   UngroundTime: 0.1

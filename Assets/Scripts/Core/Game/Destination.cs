@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Destination : MonoBehaviour
 {
@@ -7,8 +8,16 @@ public class Destination : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             Debug.Log("Destination reached!");
-            // Implement level completion logic here
-            SceneTransitionManager.Instance.LoadNextLevel();
+            // 如果是最后一个场景 则回到序号为0的场景
+            if(SceneManager.GetActiveScene().buildIndex == SceneManager.sceneCountInBuildSettings - 1)
+            {
+                SceneManager.LoadScene(0);
+            }
+            else
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            }
+
         }
     }
 }

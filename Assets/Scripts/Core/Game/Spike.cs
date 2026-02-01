@@ -8,7 +8,7 @@ public class Spike : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             Debug.Log("Player hit spike! GameOver");
-            SceneTransitionManager.Instance.RestartLevel();
+            SceneTransitionManager.Instance?.RestartLevel();
         }
     }
 }

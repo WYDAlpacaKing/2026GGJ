@@ -1,6 +1,7 @@
 using Alpaca.Game.Audio;
 using Alpaca.Game.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainPanel : BasePanel
@@ -59,10 +60,8 @@ public class MainPanel : BasePanel
     private void StartGame()
     {
         Debug.Log("开始游戏流程...");
-
+        SceneManager.LoadScene("Art_L1");
         CloseSelf();
-
-        
     }
 
     private void QuitGame()

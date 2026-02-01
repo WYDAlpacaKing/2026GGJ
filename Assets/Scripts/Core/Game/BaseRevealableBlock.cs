@@ -13,6 +13,7 @@ public class BaseRevealableBlock : MonoBehaviour
     [SerializeField] protected Color _hiddenColor = new Color(1, 1, 1, 0);
     [SerializeField] protected Color _visibleColor = Color.white;
     [SerializeField] protected string _colorPropertyName = "_BaseColor";
+    [SerializeField] protected bool _applyBaseColor = true;
 
     // �ڲ�����
     protected float _currentAlpha = 0f;
@@ -23,12 +24,14 @@ public class BaseRevealableBlock : MonoBehaviour
     protected Renderer _renderer;
     protected MaterialPropertyBlock _propBlock;
     protected int _colorPropertyID;
+    protected int _emissionPropertyID;
 
     protected virtual void Awake()
     {
         _renderer = GetComponent<Renderer>();
         _propBlock = new MaterialPropertyBlock();
         _colorPropertyID = Shader.PropertyToID(_colorPropertyName); // ����ID��������
+        _emissionPropertyID = Shader.PropertyToID("_EmissionColor");
 
         // ȷ����Collider��Trigger
         GetComponent<Collider>().isTrigger = true;
@@ -109,6 +112,9 @@ public class BaseRevealableBlock : MonoBehaviour
 
     protected virtual void UpdateVisuals(float alpha)
     {
+        if (_renderer == null || _propBlock == null) return;
+        if (!_applyBaseColor) return;
+
         // ��ɫ��ֵ
         Color c = Color.Lerp(_hiddenColor, _visibleColor, alpha);
 

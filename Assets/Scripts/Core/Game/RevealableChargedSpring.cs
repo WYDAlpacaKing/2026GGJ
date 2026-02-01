@@ -6,14 +6,16 @@ public class RevealableChargedSpring : BaseRevealableBlock
     [Header("Config")]
     [SerializeField] private ChargedSpringConfig _config;
 
-    [Header("Compression Visual (Optional)")]
-    [SerializeField] private Transform _compressionVisual;
-    [SerializeField] private float _maxCompression = 0.3f;
+    [Header("Compression Model")]
+    [SerializeField] private Transform _compressionRoot;
+    [SerializeField] private Collider _releaseTrigger;
 
     private bool _wasInteracting;
     private Vector3 _compressionOriginalScale;
-    private bool _hasPendingRelease;
+    private float _chargeTime;
+    private float _lastCompressionRatio;
     private float _pendingReleaseForce;
+    private float _pendingReleaseTime;
 
     protected override void Awake()
     {
@@ -25,25 +27,34 @@ public class RevealableChargedSpring : BaseRevealableBlock
             _solidCollider.isTrigger = false;
         }
 
-        if (_compressionVisual != null)
+        if (_compressionRoot == null)
         {
-            _compressionOriginalScale = _compressionVisual.localScale;
+            _compressionRoot = transform;
         }
+
+        _compressionOriginalScale = _compressionRoot.localScale;
     }
 
     protected override void Update()
     {
-        bool isInteracting = IsInteracting();
         base.Update();
 
+        bool isInteracting = IsInteracting();
+        bool releasedThisFrame = _wasInteracting && !isInteracting;
+
+        UpdateChargeTime(isInteracting);
         if (isInteracting)
         {
-            ApplyCompressionVisual(GetStageProgress(), GetStageIndex());
+            _lastCompressionRatio = GetCompressionRatio();
         }
-        else if (_wasInteracting)
+
+        if (releasedThisFrame)
         {
-            ReleaseSpring(GetStageIndex());
+            ReleaseSpring(_lastCompressionRatio);
         }
+
+        UpdateCompressionVisual(isInteracting, _lastCompressionRatio);
+        TryApplyPendingRelease();
 
         _wasInteracting = isInteracting;
     }
@@ -56,130 +67,184 @@ public class RevealableChargedSpring : BaseRevealableBlock
         }
     }
 
-    protected override void UpdateVisuals(float alpha)
-    {
-        if (_config == null || _config.StageGradients == null || _config.StageGradients.Length == 0)
-        {
-            base.UpdateVisuals(alpha);
-            return;
-        }
-
-        int stageIndex = GetStageIndex();
-        int safeIndex = Mathf.Clamp(stageIndex, 0, _config.StageGradients.Length - 1);
-        float stageProgress = GetStageProgress();
-
-        Color c = _config.StageGradients[safeIndex].Evaluate(stageProgress);
-
-        _renderer.GetPropertyBlock(_propBlock);
-        _propBlock.SetColor(_colorPropertyID, c);
-        _renderer.SetPropertyBlock(_propBlock);
-    }
-
     private bool IsInteracting()
     {
         return _isBrushInside && _brushTransform != null;
     }
 
-    private int GetStageCount()
-    {
-        if (_config == null) return 1;
-        return Mathf.Max(1, _config.StageCount);
-    }
-
-    private int GetStageIndex()
-    {
-        int stageCount = GetStageCount();
-        float stageSize = 1f / stageCount;
-        int index = Mathf.FloorToInt(_currentAlpha / stageSize);
-        return Mathf.Clamp(index, 0, stageCount - 1);
-    }
-
-    private float GetStageProgress()
-    {
-        int stageCount = GetStageCount();
-        float stageSize = 1f / stageCount;
-        int index = GetStageIndex();
-        float start = index * stageSize;
-        float end = start + stageSize;
-        return Mathf.InverseLerp(start, end, _currentAlpha);
-    }
-
-    private void ReleaseSpring(int stageIndex)
-    {
-        if (_config == null || _config.StageReleaseForces == null || _config.StageReleaseForces.Length == 0) return;
-
-        int forceIndex = Mathf.Clamp(stageIndex, 0, _config.StageReleaseForces.Length - 1);
-        float force = _config.StageReleaseForces[forceIndex];
-        if (force <= 0f) return;
-
-        _pendingReleaseForce = force;
-        _hasPendingRelease = true;
-    }
-
-    private void OnCollisionEnter(Collision collision)
+    private void ReleaseSpring(float compressionRatio)
     {
         if (_config == null) return;
 
-        if (TryApplyPendingRelease(collision.collider)) return;
-
-        if (_currentAlpha <= 0.01f)
+        float compressionAmount = Mathf.Clamp01(compressionRatio) * Mathf.Clamp01(_config.MaxCompressionRatio);
+        float releaseValue = _config.ForceCoefficient * compressionAmount;
+        if (_config.DebugLog)
         {
-            ApplyForceToCollider(collision.collider, _config.InactiveBounceForce);
+            Debug.Log($"[ChargedSpring] Release: ratio={compressionRatio:F2}, amount={compressionAmount:F2}, value={releaseValue:F2}", this);
+        }
+        if (releaseValue <= 0f) return;
+
+        if (!ApplyReleaseToTriggerArea(releaseValue, transform.up))
+        {
+            _pendingReleaseForce = releaseValue;
+            _pendingReleaseTime = Mathf.Max(_pendingReleaseTime, _config.ReleaseWindowTime);
+            if (_config.DebugLog)
+            {
+                Debug.Log($"[ChargedSpring] No target found, start window {_pendingReleaseTime:F2}s", this);
+            }
         }
     }
 
-    private void OnCollisionStay(Collision collision)
+    private bool ApplyReleaseToTriggerArea(float value, Vector3 direction)
     {
+        Collider trigger = _releaseTrigger != null ? _releaseTrigger : _solidCollider;
+        if (trigger == null) return false;
+
+        Bounds b = trigger.bounds;
+        Collider[] hits = Physics.OverlapBox(
+            b.center,
+            b.extents,
+            trigger.transform.rotation,
+            ~0,
+            QueryTriggerInteraction.Collide
+        );
+
+        bool appliedAny = false;
+        foreach (Collider hit in hits)
+        {
+            if (!TryGetPlayerTarget(hit, out PlayerController0 controller)) continue;
+            ApplyImpulseToTarget(hit, controller, direction, value);
+            appliedAny = true;
+        }
+
+        if (_config != null && _config.DebugLog)
+        {
+            Debug.Log($"[ChargedSpring] Trigger hits={hits.Length}, applied={appliedAny}", this);
+        }
+        return appliedAny;
+    }
+
+    private void ApplyImpulseToTarget(Collider target, PlayerController0 controller, Vector3 direction, float value)
+    {
+        if (target == null) return;
         if (_config == null) return;
-        TryApplyPendingRelease(collision.collider);
-    }
 
-    private bool TryApplyPendingRelease(Collider collider)
-    {
-        if (!_hasPendingRelease) return false;
-
-        float force = _pendingReleaseForce;
-        _hasPendingRelease = false;
-        _pendingReleaseForce = 0f;
-
-        if (force <= 0f) return false;
-
-        ApplyForceToCollider(collider, force);
-        return true;
-    }
-
-    private void ApplyForceToCollider(Collider collider, float force)
-    {
-        if (force <= 0f) return;
-
-        Vector3 dir = transform.up;
-
-        PlayerController0 controller = collider.GetComponentInParent<PlayerController0>();
+        Vector3 dir = direction;
+        dir.z = 0f;
+        dir = dir.sqrMagnitude > 0f ? dir.normalized : Vector3.up;
         if (controller != null)
         {
-            controller.ApplySpringImpulse(
-                dir,
-                force,
-                _config.MaxUpSpeed,
-                _config.UpAcceleration,
-                _config.AssistDuration,
-                _config.UngroundTime,
-                true
-            );
+            controller.ZeroZVelocity();
+            if (_config.DebugLog)
+            {
+                Debug.Log($"[ChargedSpring] Apply to PlayerController0 mode={_config.ReleaseForceMode} value={value:F2}", controller);
+            }
+            if (_config.ReleaseForceMode == ChargedSpringConfig.ReleaseMode.SetVelocity)
+            {
+                controller.SetVelocityAlongDirection(dir, value, _config.UngroundTime);
+            }
+            else
+            {
+                controller.ApplySpringImpulse(
+                    dir,
+                    value,
+                    _config.MaxUpSpeed,
+                    _config.UpAcceleration,
+                    _config.AssistDuration,
+                    _config.UngroundTime,
+                    true
+                );
+            }
             return;
         }
 
-        Rigidbody rb = collider.attachedRigidbody;
+        Rigidbody rb = target.attachedRigidbody;
         if (rb == null) return;
-        rb.AddForce(dir * force, ForceMode.VelocityChange);
+        Vector3 rbVelocity = rb.linearVelocity;
+        rbVelocity.z = 0f;
+        rb.linearVelocity = rbVelocity;
+
+        if (_config.ReleaseForceMode == ChargedSpringConfig.ReleaseMode.SetVelocity)
+        {
+            float current = Vector3.Dot(rb.linearVelocity, dir);
+            rb.linearVelocity += dir * (value - current);
+            if (_config.DebugLog)
+            {
+                Debug.Log($"[ChargedSpring] Apply to Rigidbody setVel value={value:F2}", rb);
+            }
+        }
+        else
+        {
+            rb.AddForce(dir * value, ForceMode.Impulse);
+            if (_config.DebugLog)
+            {
+                Debug.Log($"[ChargedSpring] Apply to Rigidbody impulse value={value:F2}", rb);
+            }
+        }
     }
 
-    protected virtual void ApplyCompressionVisual(float stageProgress, int stageIndex)
+    private bool TryGetPlayerTarget(Collider hit, out PlayerController0 controller)
     {
-        if (_compressionVisual == null) return;
-        float compression = Mathf.Clamp01(stageProgress) * _maxCompression;
-        Vector3 scale = _compressionOriginalScale;
-        scale.y = Mathf.Max(0.01f, scale.y * (1f - compression));
-        _compressionVisual.localScale = scale;
+        controller = hit.GetComponentInParent<PlayerController0>();
+        if (controller != null) return true;
+
+        if (hit.CompareTag("Player")) return true;
+        Transform root = hit.transform.root;
+        return root != null && root.CompareTag("Player");
+    }
+
+    private void UpdateCompressionVisual(bool isInteracting, float compressionRatio)
+    {
+        if (_compressionRoot == null || _config == null) return;
+
+        Vector3 targetScale = _compressionOriginalScale;
+        if (isInteracting)
+        {
+            float compressionAmount = Mathf.Clamp01(compressionRatio) * Mathf.Clamp01(_config.MaxCompressionRatio);
+            targetScale.y = Mathf.Max(0.01f, _compressionOriginalScale.y * (1f - compressionAmount));
+            _compressionRoot.localScale = targetScale;
+            return;
+        }
+
+        float speed = Mathf.Max(0f, _config.VisualReturnSpeed);
+        _compressionRoot.localScale = Vector3.MoveTowards(
+            _compressionRoot.localScale,
+            _compressionOriginalScale,
+            speed * Time.deltaTime
+        );
+    }
+
+    private void TryApplyPendingRelease()
+    {
+        if (_pendingReleaseTime <= 0f) return;
+
+        _pendingReleaseTime -= Time.deltaTime;
+        if (ApplyReleaseToTriggerArea(_pendingReleaseForce, transform.up))
+        {
+            _pendingReleaseTime = 0f;
+            _pendingReleaseForce = 0f;
+            if (_config != null && _config.DebugLog)
+            {
+                Debug.Log("[ChargedSpring] Pending release applied", this);
+            }
+        }
+    }
+
+    private void UpdateChargeTime(bool isInteracting)
+    {
+        if (!isInteracting)
+        {
+            _chargeTime = 0f;
+            return;
+        }
+
+        _chargeTime += Time.deltaTime;
+    }
+
+    private float GetCompressionRatio()
+    {
+        if (_config == null) return 0f;
+        if (_config.CompressToMaxTime <= 0f) return 1f;
+        return Mathf.Clamp01(_chargeTime / _config.CompressToMaxTime);
     }
 }
