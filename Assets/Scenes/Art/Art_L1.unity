@@ -293,7 +293,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5d6126a1280419944a91feb605ee0517, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 28.58
+      value: 29.81
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5d6126a1280419944a91feb605ee0517, type: 3}
       propertyPath: m_LocalPosition.y
@@ -334,6 +334,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 5d6126a1280419944a91feb605ee0517, type: 3}
       propertyPath: m_Name
       value: block-grass-large-tall
+      objectReference: {fileID: 0}
+    - target: {fileID: 3451118302482216456, guid: 5d6126a1280419944a91feb605ee0517, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2697,6 +2701,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 8bfa011d8df1d454e8f123cf791d3dc8, type: 3}
       propertyPath: m_Name
       value: flowers-tall (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3451118302482216456, guid: 8bfa011d8df1d454e8f123cf791d3dc8, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7056,6 +7064,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: grass (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 3451118302482216456, guid: 084551c7a27f29947a0af605e11dc83f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7991,7 +8003,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1f741b557f19aee40b05354ec01185c6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 33.61
+      value: 35.41
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1f741b557f19aee40b05354ec01185c6, type: 3}
       propertyPath: m_LocalPosition.y
@@ -7999,7 +8011,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1f741b557f19aee40b05354ec01185c6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.66
+      value: -1.77
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1f741b557f19aee40b05354ec01185c6, type: 3}
       propertyPath: m_LocalRotation.w

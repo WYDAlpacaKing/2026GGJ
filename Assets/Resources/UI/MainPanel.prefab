@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4245436864611362957}
   - component: {fileID: 8918981769007693676}
   m_Layer: 0
-  m_Name: SettingsButton
+  m_Name: ContinueButton (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -251,7 +251,7 @@ GameObject:
   - component: {fileID: 8029813737597281370}
   - component: {fileID: 800464305536700914}
   m_Layer: 0
-  m_Name: ExitButton
+  m_Name: ContinueButton (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -536,16 +536,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6954205864569447840}
-  m_LocalRotation: {x: -0.010367152, y: -0.09624183, z: -0.010517666, w: 0.99524844}
+  m_LocalRotation: {x: -0.01065163, y: -0.09621076, z: -0.013459839, w: 0.9952131}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.92929, y: 0.92929, z: 0.92929}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2971792436088519643}
-  m_LocalEulerAnglesHint: {x: -1.298, y: -11.035, z: -1.086}
+  m_LocalEulerAnglesHint: {x: -1.363, y: -11.027, z: -1.418}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 95, y: 173}
+  m_AnchoredPosition: {x: 283, y: 329}
   m_SizeDelta: {x: 872.3376, y: 170.1945}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3398215086796301949
@@ -576,7 +576,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'BOT
+  m_text: 'ROBOT
 
 '
   m_isRightToLeft: 0
@@ -587,8 +587,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4291472714
+  m_fontColor: {r: 0.2901961, g: 0.6784314, b: 0.79215693, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1169,7 +1169,7 @@ GameObject:
   - component: {fileID: 7492103606111340191}
   - component: {fileID: 8360486483731298707}
   m_Layer: 0
-  m_Name: StartButton
+  m_Name: ContinueButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1328,7 +1328,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0.917, y: -11.072, z: 10.22}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -514, y: 145}
+  m_AnchoredPosition: {x: -514, y: 289}
   m_SizeDelta: {x: 872.3376, y: 170.1945}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4654514828007543706
@@ -1368,8 +1368,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4287591153
+  m_fontColor: {r: 0.9433962, g: 0.4479648, b: 0.5618386, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1534,6 +1534,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ffc336ace0b8447bc3d3e291ea4621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  btnStart: {fileID: 7492103606111340191}
-  btnSettings: {fileID: 4245436864611362957}
-  btnQuit: {fileID: 8029813737597281370}
+  btnStart: {fileID: 0}
+  btnSettings: {fileID: 0}
+  btnQuit: {fileID: 0}
