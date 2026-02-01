@@ -67,7 +67,6 @@ public class RevealableClimbableWall : BaseRevealableBlock
         if ((value & (value - 1)) != 0 && !warnedMultiple)
         {
             warnedMultiple = true;
-            Debug.LogWarning("Only one layer is supported; using the first selected layer.", this);
         }
 
         int layer = 0;

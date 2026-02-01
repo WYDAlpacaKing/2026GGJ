@@ -60,6 +60,8 @@ public class MainPanel : BasePanel
     private void StartGame()
     {
         Debug.Log("开始游戏流程...");
+        MusicMgr.Instance.StopBgMusic();
+        MusicMgr.Instance.PlayBgMusic(AudioID.BGM_playing);
         SceneManager.LoadScene("Art_L1");
         CloseSelf();
     }

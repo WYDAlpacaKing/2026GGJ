@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Alpaca.Game.Audio;
 
 public class MovementFeature : MonoBehaviour
 {
@@ -13,12 +14,15 @@ public class MovementFeature : MonoBehaviour
     [SerializeField] private bool _lockZ = true;
     [SerializeField] private bool _debugLog;
     [SerializeField] private float _externalMoveThreshold = 0.001f;
+    [SerializeField] private float _movingAudioMinDistance = 0.001f;
 
     private readonly List<Vector3> _points = new List<Vector3>();
     private int _currentIndex;
     private int _direction = 1;
     private float _lockedZ;
     private Vector3 _lastLoggedPosition;
+    private AudioSource _movingLoopSource;
+    private bool _wasMoving;
 
     private void Awake()
     {
@@ -54,8 +58,44 @@ public class MovementFeature : MonoBehaviour
             AdvanceIndex();
         }
 
+        HandleMovingAudio();
         LogExternalMove(startPos, expected);
         LogState(target);
+    }
+
+    private void HandleMovingAudio()
+    {
+        bool isMoving = _points.Count > 0 && (transform.position - _points[_currentIndex]).sqrMagnitude >
+                        _movingAudioMinDistance * _movingAudioMinDistance;
+
+        if (isMoving && !_wasMoving)
+        {
+            StartMovingAudio();
+        }
+        else if (!isMoving && _wasMoving)
+        {
+            StopMovingAudio();
+        }
+
+        _wasMoving = isMoving;
+    }
+
+    private void StartMovingAudio()
+    {
+        if (_movingLoopSource != null) return;
+        MusicMgr.Instance?.PlaySound(AudioID.SFX_Platform_moving, true, source => _movingLoopSource = source);
+    }
+
+    private void StopMovingAudio()
+    {
+        if (_movingLoopSource == null) return;
+        MusicMgr.Instance?.StopSound(_movingLoopSource);
+        _movingLoopSource = null;
+    }
+
+    private void OnDisable()
+    {
+        StopMovingAudio();
     }
 
     private void AdvanceIndex()

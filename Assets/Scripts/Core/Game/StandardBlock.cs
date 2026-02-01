@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using Alpaca.Game.Audio;
 
 
 public class StandardBlock : BaseRevealableBlock
@@ -79,6 +80,7 @@ public class StandardBlock : BaseRevealableBlock
     private bool _fruitIsParent;
     private bool _isDeactivating;
     private float _lastLoggedAlpha = -1f;
+    private AudioSource _flyLoopSource;
 
     protected override void Awake()
     {
@@ -266,6 +268,8 @@ public class StandardBlock : BaseRevealableBlock
         }
 
         _activateSequence.Append(AnimateParticles(_particleScaleTo));
+
+        StartFlyLoopAudio();
     }
 
     private void StartDeactivateSequence()
@@ -274,6 +278,8 @@ public class StandardBlock : BaseRevealableBlock
         _isDeactivating = true;
         KillSequences();
         if (_debugLog) Debug.Log("[StandardBlock] Deactivate sequence start", this);
+
+        StopFlyLoopAudio();
 
         if (_fruitTransform != null)
         {
@@ -350,6 +356,20 @@ public class StandardBlock : BaseRevealableBlock
     {
         KillSequences();
         StopBreathing();
+        StopFlyLoopAudio();
+    }
+
+    private void StartFlyLoopAudio()
+    {
+        if (_flyLoopSource != null) return;
+        MusicMgr.Instance?.PlaySound(AudioID.SFX_Platform_fly, true, source => _flyLoopSource = source);
+    }
+
+    private void StopFlyLoopAudio()
+    {
+        if (_flyLoopSource == null) return;
+        MusicMgr.Instance?.StopSound(_flyLoopSource);
+        _flyLoopSource = null;
     }
 
     private void ResolveFruitScales()
