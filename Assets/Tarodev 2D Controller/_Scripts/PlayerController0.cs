@@ -7,6 +7,15 @@ namespace TarodevController.old
     public class PlayerController0 : MonoBehaviour, IPlayerController
     {
         [SerializeField] private ScriptableStats _stats;
+       
+        public enum VisualRotateDirection
+        {
+            Clockwise,
+            CounterClockwise
+        }
+        [SerializeField] private Transform _visual;
+        [SerializeField] private float _visualRotateSpeed = 720f;
+        [SerializeField] private VisualRotateDirection _visualRotateDirection = VisualRotateDirection.Clockwise;
         private Rigidbody _rb;
         private CapsuleCollider _col;
         private FrameInput _frameInput;
@@ -37,12 +46,19 @@ namespace TarodevController.old
             _rb.constraints = RigidbodyConstraints.FreezeRotation;
             _cachedQueryStartInColliders = Physics.queriesHitTriggers;
             _lockedZ = transform.position.z;
+
+            if (_visual == null)
+            {
+                Transform visualChild = transform.Find("Visual");
+                if (visualChild != null) _visual = visualChild;
+            }
         }
 
         private void Update()
         {
             _time += Time.deltaTime;
             GatherInput();
+            UpdateVisualFacing();
         }
 
         private void GatherInput()
@@ -65,6 +81,28 @@ namespace TarodevController.old
                 _jumpToConsume = true;
                 _timeJumpWasPressed = _time;
             }
+        }
+
+        private void UpdateVisualFacing()
+        {
+            if (_visual == null) return;
+            if (Mathf.Abs(_frameInput.Move.x) < 0.01f) return;
+
+            float targetYaw = _frameInput.Move.x > 0 ? 0f : 180f;
+            float currentYaw = _visual.localEulerAngles.y;
+            float delta = Mathf.DeltaAngle(currentYaw, targetYaw);
+            if (_visualRotateDirection == VisualRotateDirection.Clockwise && delta > 0f)
+            {
+                delta -= 360f;
+            }
+            else if (_visualRotateDirection == VisualRotateDirection.CounterClockwise && delta < 0f)
+            {
+                delta += 360f;
+            }
+
+            float maxStep = _visualRotateSpeed * Time.deltaTime;
+            float step = Mathf.Clamp(delta, -maxStep, maxStep);
+            _visual.localRotation = Quaternion.Euler(0f, currentYaw + step, 0f);
         }
 
         private void FixedUpdate()

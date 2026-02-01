@@ -422,9 +422,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: NewSpring
       objectReference: {fileID: 0}
+    - target: {fileID: 1278182605793945536, guid: 8b7838e126e508e49ae9040e160fda45, type: 3}
+      propertyPath: _config
+      value: 
+      objectReference: {fileID: 11400000, guid: 879265085fe2df64286cff87ba13f470, type: 2}
     - target: {fileID: 4103740098943394762, guid: 8b7838e126e508e49ae9040e160fda45, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 14.73386
+      value: 10.95
       objectReference: {fileID: 0}
     - target: {fileID: 4103740098943394762, guid: 8b7838e126e508e49ae9040e160fda45, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3314,11 +3318,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 701398147531183446, guid: ec0094563f3ef9644af21496ef39b783, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -12
+      value: 7.95
       objectReference: {fileID: 0}
     - target: {fileID: 701398147531183446, guid: ec0094563f3ef9644af21496ef39b783, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.6
+      value: 5.78
       objectReference: {fileID: 0}
     - target: {fileID: 701398147531183446, guid: ec0094563f3ef9644af21496ef39b783, type: 3}
       propertyPath: m_LocalPosition.z

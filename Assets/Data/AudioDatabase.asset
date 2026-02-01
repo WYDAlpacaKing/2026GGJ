@@ -20,4 +20,4 @@ MonoBehaviour:
   - id: 0
     clip: {fileID: 0}
     resourcePath: 
-    useClipDirectly: 0
+    useClipDirectly: 1
