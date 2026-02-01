@@ -129,9 +129,12 @@ public class RevealableChargedSpring : BaseRevealableBlock
         if (target == null) return;
         if (_config == null) return;
 
-        Vector3 dir = direction.sqrMagnitude > 0f ? direction.normalized : Vector3.up;
+        Vector3 dir = direction;
+        dir.z = 0f;
+        dir = dir.sqrMagnitude > 0f ? dir.normalized : Vector3.up;
         if (controller != null)
         {
+            controller.ZeroZVelocity();
             if (_config.DebugLog)
             {
                 Debug.Log($"[ChargedSpring] Apply to PlayerController0 mode={_config.ReleaseForceMode} value={value:F2}", controller);
@@ -157,6 +160,9 @@ public class RevealableChargedSpring : BaseRevealableBlock
 
         Rigidbody rb = target.attachedRigidbody;
         if (rb == null) return;
+        Vector3 rbVelocity = rb.linearVelocity;
+        rbVelocity.z = 0f;
+        rb.linearVelocity = rbVelocity;
 
         if (_config.ReleaseForceMode == ChargedSpringConfig.ReleaseMode.SetVelocity)
         {

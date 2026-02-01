@@ -310,6 +310,17 @@ namespace TarodevController.old
             Debug.Log($"[PlayerController0] SetVelocityAlongDirection speed={speed:F2} unground={ungroundTime:F2}", this);
         }
 
+        public void ZeroZVelocity()
+        {
+            _frameVelocity.z = 0f;
+            if (_rb != null)
+            {
+                Vector3 v = _rb.linearVelocity;
+                v.z = 0f;
+                _rb.linearVelocity = v;
+            }
+        }
+
         public void ApplySpringImpulse(
             Vector3 direction,
             float force,

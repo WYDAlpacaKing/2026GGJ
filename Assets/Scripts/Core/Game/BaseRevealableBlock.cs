@@ -23,12 +23,14 @@ public class BaseRevealableBlock : MonoBehaviour
     protected Renderer _renderer;
     protected MaterialPropertyBlock _propBlock;
     protected int _colorPropertyID;
+    protected int _emissionPropertyID;
 
     protected virtual void Awake()
     {
         _renderer = GetComponent<Renderer>();
         _propBlock = new MaterialPropertyBlock();
         _colorPropertyID = Shader.PropertyToID(_colorPropertyName); // ����ID��������
+        _emissionPropertyID = Shader.PropertyToID("_EmissionColor");
 
         // ȷ����Collider��Trigger
         GetComponent<Collider>().isTrigger = true;
