@@ -16,7 +16,7 @@ MonoBehaviour:
   ForceCoefficient: 200
   MaxCompressionRatio: 0.3
   VisualReturnSpeed: 8
-  ReleaseForceMode: 1
+  ReleaseForceMode: 0
   ReleaseWindowTime: 0.15
   DebugLog: 1
   MaxUpSpeed: 283.2
