@@ -17,7 +17,47 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 2716fc6981630f144998ef6fd7c1a77b, type: 3}
     resourcePath: 
     useClipDirectly: 0
-  - id: 0
-    clip: {fileID: 0}
+  - id: 1
+    clip: {fileID: 8300000, guid: 68a8e7e1e7721e3439da40379bbf9187, type: 3}
+    resourcePath: 
+    useClipDirectly: 0
+  - id: 101
+    clip: {fileID: 8300000, guid: a11883b1f5414434b962b5477fafed82, type: 3}
+    resourcePath: 
+    useClipDirectly: 0
+  - id: 100
+    clip: {fileID: 8300000, guid: eb50940657d2492468185b7b9e3bac68, type: 3}
+    resourcePath: 
+    useClipDirectly: 0
+  - id: 102
+    clip: {fileID: 8300000, guid: 9de5ce9d009781a478841b86f1d6acdc, type: 3}
+    resourcePath: 
+    useClipDirectly: 0
+  - id: 103
+    clip: {fileID: 8300000, guid: d4c1efd5a1172ea45bac5a05cf984c4c, type: 3}
+    resourcePath: 
+    useClipDirectly: 0
+  - id: 104
+    clip: {fileID: 8300000, guid: 7c45063bb5be6214fbd24e604492b5c1, type: 3}
+    resourcePath: 
+    useClipDirectly: 0
+  - id: 105
+    clip: {fileID: 8300000, guid: dd6bc70f2097d8b4187060d1f1ba5fb9, type: 3}
+    resourcePath: 
+    useClipDirectly: 0
+  - id: 106
+    clip: {fileID: 8300000, guid: 3a786b9a955d95b46b1dff1a1822a27e, type: 3}
+    resourcePath: 
+    useClipDirectly: 0
+  - id: 107
+    clip: {fileID: 8300000, guid: 4ee165a36520d7e4c83415a613c0f30a, type: 3}
+    resourcePath: 
+    useClipDirectly: 0
+  - id: 108
+    clip: {fileID: 8300000, guid: 6808b4bbf0b779948af586576a84f3f3, type: 3}
+    resourcePath: 
+    useClipDirectly: 0
+  - id: 109
+    clip: {fileID: 8300000, guid: 8612865726687d24fb2813a9bd5625b3, type: 3}
     resourcePath: 
     useClipDirectly: 0
