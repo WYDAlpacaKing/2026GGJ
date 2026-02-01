@@ -6,33 +6,34 @@ using UnityEngine.UI;
 
 public class MainPanel : BasePanel
 {
-    [Header("--- UI ×é¼þÒýÓÃ ---")]
+    [Header("--- UI ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ---")]
     [SerializeField] private Button btnStart;
     [SerializeField] private Button btnSettings;
     [SerializeField] private Button btnQuit;
+    private bool _waitingForScene;
 
-    // ÖØÐ´»ùÀàµÄ OnInit£¬Ö»ÔÚµÚÒ»´Î¼ÓÔØÊ±Ö´ÐÐ
+    // ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ OnInitï¿½ï¿½Ö»ï¿½Úµï¿½Ò»ï¿½Î¼ï¿½ï¿½ï¿½Ê±Ö´ï¿½ï¿½
     public override void Init(params object[] args)
     {
         base.Init(args);
 
-        // --- 1. °ó¶¨¿ªÊ¼ÓÎÏ· ---
+        // --- 1. ï¿½ó¶¨¿ï¿½Ê¼ï¿½ï¿½Ï· ---
         btnStart.onClick.AddListener(() =>
         {
             PlayClickSound();
             StartGame();
         });
 
-        // --- 2. °ó¶¨ÉèÖÃÃæ°å ---
-        // ÕâÀïÑÝÊ¾ºËÐÄ¹¦ÄÜ£ºµþ¼Ó´ò¿ªÒ»¸öÐÂµÄÃæ°å
+        // --- 2. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ---
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ä¹ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½Ó´ï¿½Ò»ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½ï¿½
         btnSettings.onClick.AddListener(() =>
         {
             PlayClickSound();
-            // ´ò¿ªÉèÖÃÃæ°å£¬Ö¸¶¨ÔÚ Normal ²ã£¨»òÕß Top ²ã£¬¿´Éè¼Æ£©
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½å£¬Ö¸ï¿½ï¿½ï¿½ï¿½ Normal ï¿½ã£¨ï¿½ï¿½ï¿½ï¿½ Top ï¿½ã£¬ï¿½ï¿½ï¿½ï¿½Æ£ï¿½
             UIManager.Instance.OpenPanel("SettingsPanel", UILayer.Normal);
         });
 
-        // --- 3. °ó¶¨ÍË³öÓÎÏ· ---
+        // --- 3. ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½Ï· ---
         btnQuit.onClick.AddListener(() =>
         {
             PlayClickSound();
@@ -41,35 +42,48 @@ public class MainPanel : BasePanel
     }
 
     /// <summary>
-    /// Ã¿´Î´ò¿ªÃæ°åÊ±µ÷ÓÃ (±ÈÈç´ÓÉèÖÃ½çÃæ·µ»ØÊ±£¬»òÕß¸ÕÆô¶¯Ê±)
+    /// Ã¿ï¿½Î´ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½æ·µï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ß¸ï¿½ï¿½ï¿½ï¿½ï¿½Ê±)
     /// </summary>
     public override void OnOpen(params object[] args)
     {
         base.OnOpen(args);
 
-        // ²¥·ÅÖ÷²Ëµ¥ BGM
-        // (¼ÙÉèÄãÔÚ AudioID Àï¶¨ÒåÁË BGM_MainMenu)
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ BGM
+        // (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ AudioID ï¿½ï¶¨ï¿½ï¿½ï¿½ï¿½ BGM_MainMenu)
 
 
 
         //MusicMgr.Instance.PlayBgMusic(AudioID.BGM_MainMenu);
     }
 
-    // --- ÒµÎñÂß¼­ ---
+    // --- Òµï¿½ï¿½ï¿½ß¼ï¿½ ---
 
     private void StartGame()
     {
-        Debug.Log("¿ªÊ¼ÓÎÏ·Á÷³Ì...");
+        Debug.Log("ï¿½ï¿½Ê¼ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½...");
         MusicMgr.Instance.StopBgMusic();
         MusicMgr.Instance.PlayBgMusic(AudioID.BGM_playing);
+        if (!_waitingForScene)
+        {
+            _waitingForScene = true;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
         SceneManager.LoadScene("Art_L1");
-        GameManager.Instance.StartGame();
+        UIManager.Instance.Back();
         CloseSelf();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name != "Art_L1") return;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        _waitingForScene = false;
+        GameManager.Instance.StartGame();
     }
 
     private void QuitGame()
     {
-        Debug.Log("ÍË³öÓÎÏ·");
+        Debug.Log("ï¿½Ë³ï¿½ï¿½ï¿½Ï·");
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
@@ -77,10 +91,10 @@ public class MainPanel : BasePanel
 #endif
     }
 
-    // ¸¨Öú·½·¨£º²¥·ÅÍ¨ÓÃµÄ UI µã»÷ÒôÐ§
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½Ãµï¿½ UI ï¿½ï¿½ï¿½ï¿½ï¿½Ð§
     private void PlayClickSound()
     {
-        // (¼ÙÉèÄãÔÚ AudioID Àï¶¨ÒåÁË SFX_UIClick)
+        // (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ AudioID ï¿½ï¶¨ï¿½ï¿½ï¿½ï¿½ SFX_UIClick)
          //MusicMgr.Instance.PlaySound(AudioID.SFX_UIClick);
     }
 }

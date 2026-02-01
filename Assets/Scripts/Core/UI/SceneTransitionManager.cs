@@ -27,6 +27,8 @@ public class SceneTransitionManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        Cursor.visible = false;
+       
 
         // ��ʼ��״̬��ԲȦ��Ϊ0������ȫ͸��
         if (circleWipe) circleWipe.localScale = Vector3.zero;
