@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -12.5, y: -2.05192, z: 0}
-  m_LocalScale: {x: 3.5, y: 0.47393, z: 3.3725}
+  m_LocalScale: {x: 2.44818, y: 0.33150455, z: 2.3589962}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1840190546714090279}
@@ -129,14 +129,32 @@ MonoBehaviour:
   _baseRevealDuration: 1
   _vanishDuration: 1
   _solidCollider: {fileID: 3957330980150213730}
-  _hiddenColor: {r: 1, g: 0, b: 0, a: 0.9137255}
+  _hiddenColor: {r: 1, g: 1, b: 1, a: 0.9137255}
   _visibleColor: {r: 1, g: 1, b: 1, a: 1}
   _colorPropertyName: _BaseColor
+  _applyBaseColor: 0
+  _baseMapRenderers:
+  - {fileID: 7705134511298988820}
+  - {fileID: 2114517147833066286}
+  - {fileID: 1900904672767507252}
+  _baseMapPropertyName: _BaseColor
+  _baseMapAlphaMin: 1
+  _baseMapAlphaMax: 1
+  _breatheDuration: 1.5
+  _returnToBreathDuration: 0.4
   _emissionRenderer: {fileID: 6840760371491136691}
   _emissionPropertyName: _EmissionColor
   _emissionColor: {r: 0.8050314, g: 0.66197824, b: 0.15948726, a: 1}
   _emissionIntensityFrom: -3
   _emissionIntensityTo: 2
+  _fruitObject: {fileID: 6227283711896865543}
+  _useRelativeFruitScale: 1
+  _fruitScaleSmallMultiplier: {x: 0.6, y: 0.6, z: 0.6}
+  _fruitScaleOvershootMultiplier: {x: 1.1, y: 1.1, z: 1.1}
+  _fruitScaleSmall: {x: 0.017101958, y: 0.017748512, z: 0.0012629895}
+  _fruitScaleOvershoot: {x: 0.21637312, y: 0.22455329, z: 0.015979279}
+  _fruitGrowDuration: 0.15
+  _fruitSettleDuration: 0.35
   _particleEffects:
   - {fileID: 7801869866822708568}
   - {fileID: 5096746556030733458}
@@ -144,6 +162,8 @@ MonoBehaviour:
   - {fileID: 2686629171898018059}
   _particleScaleFrom: {x: 0.13, y: 0.100213215, z: 0.12526429}
   _particleScaleTo: {x: 1.1606774, y: 0.8947325, z: 1.1183957}
+  _particleScaleDuration: 0.3
+  _debugLog: 0
 --- !u!1 &949119164818091803
 GameObject:
   m_ObjectHideFlags: 0
@@ -4850,7 +4870,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6538903991835684241, guid: 991ca9203a6686844a917e16c34eb74a, type: 3}
+  - {fileID: 2100000, guid: 49a10892d91714c49a8360065a3639c8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -38129,7 +38149,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6538903991835684241, guid: 9d4a935d69b5cb94c95275506b11c1fa, type: 3}
+  - {fileID: 2100000, guid: 49a10892d91714c49a8360065a3639c8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

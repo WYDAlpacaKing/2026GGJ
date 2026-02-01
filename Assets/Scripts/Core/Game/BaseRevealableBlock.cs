@@ -13,6 +13,7 @@ public class BaseRevealableBlock : MonoBehaviour
     [SerializeField] protected Color _hiddenColor = new Color(1, 1, 1, 0);
     [SerializeField] protected Color _visibleColor = Color.white;
     [SerializeField] protected string _colorPropertyName = "_BaseColor";
+    [SerializeField] protected bool _applyBaseColor = true;
 
     // �ڲ�����
     protected float _currentAlpha = 0f;
@@ -111,6 +112,9 @@ public class BaseRevealableBlock : MonoBehaviour
 
     protected virtual void UpdateVisuals(float alpha)
     {
+        if (_renderer == null || _propBlock == null) return;
+        if (!_applyBaseColor) return;
+
         // ��ɫ��ֵ
         Color c = Color.Lerp(_hiddenColor, _visibleColor, alpha);
 

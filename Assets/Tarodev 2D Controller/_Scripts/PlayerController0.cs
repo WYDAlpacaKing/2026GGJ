@@ -136,8 +136,27 @@ namespace TarodevController.old
             Vector3 point1 = colCenter + Vector3.up * (halfHeight - _col.radius - shrinkAmount);
             Vector3 point2 = colCenter - Vector3.up * (halfHeight - _col.radius - shrinkAmount);
 
-            bool hitRight = Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, Vector3.right, out RaycastHit hitR, _stats.WallDetectionDistance, _stats.ClimbableLayer);
-            bool hitLeft = Physics.CapsuleCast(point1, point2, _col.radius - 0.05f, Vector3.left, out RaycastHit hitL, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+            float checkRadius = _col.radius - 0.05f;
+            bool hitRight = Physics.CapsuleCast(point1, point2, checkRadius, Vector3.right, out RaycastHit hitR, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+            bool hitLeft = Physics.CapsuleCast(point1, point2, checkRadius, Vector3.left, out RaycastHit hitL, _stats.WallDetectionDistance, _stats.ClimbableLayer);
+
+            if (!hitRight && !hitLeft)
+            {
+                Vector3 rightOffset = Vector3.right * (_stats.WallDetectionDistance + 0.01f);
+                Vector3 leftOffset = Vector3.left * (_stats.WallDetectionDistance + 0.01f);
+                hitRight = Physics.CheckCapsule(point1 + rightOffset, point2 + rightOffset, checkRadius, _stats.ClimbableLayer);
+                hitLeft = Physics.CheckCapsule(point1 + leftOffset, point2 + leftOffset, checkRadius, _stats.ClimbableLayer);
+                if (hitRight)
+                {
+                    hitR = default;
+                    hitR.normal = Vector3.left;
+                }
+                else if (hitLeft)
+                {
+                    hitL = default;
+                    hitL.normal = Vector3.right;
+                }
+            }
 
             if (hitRight || hitLeft)
             {
