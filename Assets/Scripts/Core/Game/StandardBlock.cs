@@ -33,6 +33,8 @@ public class StandardBlock : BaseRevealableBlock
     [Header("果实 (GameObject)")]
     [Tooltip("果实 GameObject")]
     [SerializeField] private GameObject _fruitObject;
+    [Tooltip("果实缩放目标（可选，避免缩放父物体导致平台抖动）")]
+    [SerializeField] private Transform _fruitScaleTarget;
     [Tooltip("是否用当前模型的原始尺寸作为基准，再用倍率缩放")]
     [SerializeField] private bool _useRelativeFruitScale = true;
     [Tooltip("使用相对缩放时：最小倍率")]
@@ -74,6 +76,7 @@ public class StandardBlock : BaseRevealableBlock
     private Vector3 _fruitScaleOvershootResolved;
     private bool _activated;
     private bool _fruitIsSelf;
+    private bool _fruitIsParent;
     private bool _isDeactivating;
     private float _lastLoggedAlpha = -1f;
 
@@ -137,14 +140,19 @@ public class StandardBlock : BaseRevealableBlock
         if (_fruitObject != null)
         {
             _fruitIsSelf = _fruitObject == gameObject;
+            _fruitIsParent = transform.IsChildOf(_fruitObject.transform);
             if (_fruitIsSelf)
             {
                 Debug.LogWarning("[StandardBlock] Fruit Object is the same GameObject as this component; skipping fruit activation to avoid disabling this script.", this);
             }
-            _fruitTransform = _fruitObject.transform;
+            else if (_fruitIsParent)
+            {
+                Debug.LogWarning("[StandardBlock] Fruit Object is a parent of this platform. Its scaling may move the platform and cause jitter.", this);
+            }
+            _fruitTransform = _fruitScaleTarget != null ? _fruitScaleTarget : _fruitObject.transform;
             _fruitScaleNormal = _fruitTransform.localScale;
             ResolveFruitScales();
-            if (!_fruitIsSelf) _fruitObject.SetActive(false);
+            if (CanToggleFruitObject()) _fruitObject.SetActive(false);
         }
 
         SetParticleScales(_particleScaleFrom);
@@ -171,6 +179,7 @@ public class StandardBlock : BaseRevealableBlock
 
             if (renderer.sharedMaterial != null && renderer.sharedMaterial.HasProperty(_baseMapPropertyName))
             {
+                Debug.LogWarning("[StandardBlock] cchageBaseMap is already", this);
                 _baseMapColors[i] = renderer.sharedMaterial.GetColor(_baseMapPropertyName);
             }
             else
@@ -241,7 +250,7 @@ public class StandardBlock : BaseRevealableBlock
 
         if (_fruitTransform != null)
         {
-            if (!_fruitIsSelf) _fruitObject.SetActive(true);
+            if (CanToggleFruitObject()) _fruitObject.SetActive(true);
             _fruitTransform.localScale = _fruitScaleSmallResolved;
         }
 
@@ -268,7 +277,7 @@ public class StandardBlock : BaseRevealableBlock
 
         if (_fruitTransform != null)
         {
-            if (!_fruitIsSelf) _fruitObject.SetActive(true);
+            if (CanToggleFruitObject()) _fruitObject.SetActive(true);
             _fruitTransform.localScale = _fruitScaleNormal;
         }
 
@@ -296,7 +305,7 @@ public class StandardBlock : BaseRevealableBlock
                         _isDeactivating = false;
                         EnsureBreathing();
                     });
-                if (!_fruitIsSelf) _fruitObject.SetActive(false);
+                if (CanToggleFruitObject()) _fruitObject.SetActive(false);
             });
         }
     }
@@ -355,6 +364,11 @@ public class StandardBlock : BaseRevealableBlock
             _fruitScaleSmallResolved = _fruitScaleSmall;
             _fruitScaleOvershootResolved = _fruitScaleOvershoot;
         }
+    }
+
+    private bool CanToggleFruitObject()
+    {
+        return _fruitObject != null && !_fruitIsSelf && !_fruitIsParent;
     }
 
     private void LogState(float alpha)
