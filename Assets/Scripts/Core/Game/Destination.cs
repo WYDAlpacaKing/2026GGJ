@@ -11,11 +11,11 @@ public class Destination : MonoBehaviour
             // 如果是最后一个场景 则回到序号为0的场景
             if(SceneManager.GetActiveScene().buildIndex == SceneManager.sceneCountInBuildSettings - 1)
             {
-                SceneManager.LoadScene(0);
+                SceneTransitionManager.Instance.LoadSpecificScene(0);
             }
             else
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                SceneTransitionManager.Instance.LoadNextLevel();
             }
 
         }

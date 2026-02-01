@@ -49,9 +49,17 @@ public class SceneTransitionManager : MonoBehaviour
         StartCoroutine(TransitionSequence(nextIndex));
     }
 
-    /// <summary>
-    /// ���¿�ʼ��ǰ�ؿ�
-    /// </summary>
+    public void LoadSpecificScene(int level)
+    {
+        //如果level并不存在则不执行
+        if (level < 0 || level >= SceneManager.sceneCountInBuildSettings)
+        {
+            Debug.LogWarning("Level not found in Build Settings. Load skipped.");
+            return;
+        }
+        StartCoroutine(TransitionSequence(level));
+    }
+
     public void RestartLevel()
     {
         int currentIndex = SceneManager.GetActiveScene().buildIndex;

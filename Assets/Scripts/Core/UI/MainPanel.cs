@@ -52,7 +52,7 @@ public class MainPanel : BasePanel
 
 
 
-        MusicMgr.Instance.PlayBgMusic(AudioID.BGM_MainMenu);
+        //MusicMgr.Instance.PlayBgMusic(AudioID.BGM_MainMenu);
     }
 
     // --- 业务逻辑 ---
@@ -60,6 +60,8 @@ public class MainPanel : BasePanel
     private void StartGame()
     {
         Debug.Log("开始游戏流程...");
+        MusicMgr.Instance.StopBgMusic();
+        MusicMgr.Instance.PlayBgMusic(AudioID.BGM_playing);
         SceneManager.LoadScene("Art_L1");
         CloseSelf();
     }
@@ -78,6 +80,6 @@ public class MainPanel : BasePanel
     private void PlayClickSound()
     {
         // (假设你在 AudioID 里定义了 SFX_UIClick)
-         MusicMgr.Instance.PlaySound(AudioID.SFX_UIClick);
+         //MusicMgr.Instance.PlaySound(AudioID.SFX_UIClick);
     }
 }
