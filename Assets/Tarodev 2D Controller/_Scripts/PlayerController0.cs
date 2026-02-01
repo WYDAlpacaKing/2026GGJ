@@ -297,6 +297,19 @@ namespace TarodevController.old
             }
         }
 
+        public void SetVelocityAlongDirection(Vector3 direction, float speed, float ungroundTime = 0.1f)
+        {
+            Vector3 dir = direction.sqrMagnitude > 0f ? direction.normalized : Vector3.up;
+            float current = Vector3.Dot(_frameVelocity, dir);
+            _frameVelocity += dir * (speed - current);
+
+            if (ungroundTime > 0f)
+            {
+                _forceUngroundTime = Mathf.Max(_forceUngroundTime, _time + ungroundTime);
+            }
+            Debug.Log($"[PlayerController0] SetVelocityAlongDirection speed={speed:F2} unground={ungroundTime:F2}", this);
+        }
+
         public void ApplySpringImpulse(
             Vector3 direction,
             float force,
@@ -309,6 +322,11 @@ namespace TarodevController.old
             Vector3 dir = direction.sqrMagnitude > 0f ? direction.normalized : Vector3.up;
             _springDirection = dir;
             AddFrameVelocity(dir * force, resetVelocity, ungroundTime);
+
+            if (ungroundTime > 0f)
+            {
+                _forceUngroundTime = Mathf.Max(_forceUngroundTime, _time + ungroundTime);
+            }
 
             if (maxUpSpeed > 0f)
             {
@@ -325,6 +343,7 @@ namespace TarodevController.old
                 _springUpAcceleration = upAcceleration;
                 _springAssistTime = Mathf.Max(_springAssistTime, assistDuration);
             }
+            Debug.Log($"[PlayerController0] ApplySpringImpulse force={force:F2} maxUp={maxUpSpeed:F2} unground={ungroundTime:F2}", this);
         }
 
 #if UNITY_EDITOR
