@@ -29,6 +29,7 @@ public class GameManager : BaseMonoMgr<GameManager>
     public void StartGame()
     {
         CurrentState = GameState.Playing;
+        CursorLock();
     }
 
     public void PauseGame()
@@ -37,6 +38,7 @@ public class GameManager : BaseMonoMgr<GameManager>
         {
             CurrentState = GameState.Paused;
             Time.timeScale = 0f; // 暂停游戏时间
+            UnlockCursor();
             UIManager.Instance.OpenPanel("PausePanel");
         }
     }
@@ -48,6 +50,7 @@ public class GameManager : BaseMonoMgr<GameManager>
             CurrentState = GameState.Playing;
             Time.timeScale = 1f; // 恢复游戏时间
             UIManager.Instance.Back(); // 关闭暂停面板
+            CursorLock();
         }
     }
 
@@ -55,6 +58,17 @@ public class GameManager : BaseMonoMgr<GameManager>
     {
         CurrentState = GameState.MainMenu;
         Time.timeScale = 1f; // 确保时间恢复正常
+        UnlockCursor();
+    }
+
+    public void CursorLock()
+    {
+        Cursor.visible = false;
+    }
+
+    public void UnlockCursor()
+    {
+        Cursor.visible = true;
     }
 }
 
